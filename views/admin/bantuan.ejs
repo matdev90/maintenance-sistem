@@ -1,0 +1,433 @@
+<style>
+  @media (max-width: 767.98px) {
+    .bantuan-nav-desktop { display: none !important; }
+    .bantuan-nav-mobile { display: block !important; }
+    .bantuan-nav-mobile .list-group { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 4px; padding-bottom: 4px; scrollbar-width: none; }
+    .bantuan-nav-mobile .list-group::-webkit-scrollbar { display: none; }
+    .bantuan-nav-mobile .list-group-item { white-space: nowrap; font-size: .75rem; padding: .4rem .7rem; border-radius: 20px; border: 1px solid #dee2e6; flex-shrink: 0; }
+    .bantuan-nav-mobile .list-group-item.active { background: #667eea; border-color: #667eea; color: #fff; }
+    .bantuan-content .row > [class*="col-md-"] { flex: 0 0 100%; max-width: 100%; }
+    .bantuan-content table { font-size: .75rem; }
+    .bantuan-content h6 { font-size: .85rem; }
+    .bantuan-content .alert { font-size: .8rem; }
+    .bantuan-content ol, .bantuan-content ul { padding-left: 1.2rem; }
+    .bantuan-content .badge { font-size: .7rem; }
+    .bantuan-content pre, .bantuan-content code { font-size: .75rem; }
+    .bantuan-content .bg-light { font-size: .7rem; word-break: break-all; }
+    .bantuan-content .card-body { padding: 1rem; }
+  }
+  @media (min-width: 768px) {
+    .bantuan-nav-mobile { display: none !important; }
+  }
+</style>
+
+<div class="bantuan-content">
+<div class="row">
+  <div class="col-12">
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="alert alert-info d-flex align-items-center">
+          <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+          <div>Panduan lengkap penggunaan aplikasi <strong>SIMRS CareTrack</strong>. Pilih menu sesuai peran Anda.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bantuan-nav-mobile mb-3">
+  <div class="list-group">
+    <a href="#tentang" class="list-group-item list-group-item-action active">1. Tentang</a>
+    <a href="#login" class="list-group-item list-group-item-action">2. Login</a>
+    <a href="#dashboard" class="list-group-item list-group-item-action">3. Dashboard</a>
+    <a href="#tiket" class="list-group-item list-group-item-action">4. Tiket</a>
+    <a href="#telegram" class="list-group-item list-group-item-action">5. Telegram</a>
+    <a href="#rating" class="list-group-item list-group-item-action">6. Rating</a>
+    <a href="#notifikasi" class="list-group-item list-group-item-action">7. Notifikasi</a>
+    <a href="#mutu" class="list-group-item list-group-item-action">8. Mutu</a>
+    <a href="#display" class="list-group-item list-group-item-action">9. Display</a>
+    <a href="#admin" class="list-group-item list-group-item-action">10. Admin</a>
+  </div>
+</div>
+
+<div class="row bantuan-nav-desktop">
+  <div class="col-md-3 mb-3">
+    <div class="list-group sticky-top" style="top:60px; max-height:calc(100vh - 80px); overflow-y:auto;">
+      <a href="#tentang" class="list-group-item list-group-item-action active">1. Tentang Aplikasi</a>
+      <a href="#login" class="list-group-item list-group-item-action">2. Login & Keamanan</a>
+      <a href="#dashboard" class="list-group-item list-group-item-action">3. Dashboard</a>
+      <a href="#tiket" class="list-group-item list-group-item-action">4. Tiket Laporan</a>
+      <a href="#telegram" class="list-group-item list-group-item-action">5. Telegram Bot & Inline Keyboard</a>
+      <a href="#rating" class="list-group-item list-group-item-action">6. Rating Kepuasan</a>
+      <a href="#notifikasi" class="list-group-item list-group-item-action">7. Notifikasi Real-Time</a>
+      <a href="#mutu" class="list-group-item list-group-item-action">8. Laporan Mutu & Ekspor</a>
+      <a href="#display" class="list-group-item list-group-item-action">9. Display Monitor</a>
+      <a href="#admin" class="list-group-item list-group-item-action">10. Admin Panel</a>
+    </div>
+  </div>
+
+  <div class="col-md-9">
+
+    <!-- ======================== 1. TENTANG ======================== -->
+    <div class="card mb-4" id="tentang">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-info-circle"></i> 1. Tentang Aplikasi</h6></div>
+      <div class="card-body">
+        <p><strong>SIMRS CareTrack</strong> adalah Sistem Tiket Pemeliharaan Terintegrasi untuk lingkungan Rumah Sakit yang mencakup layanan <strong>SIMRS</strong> (IT) dan <strong>IPSRS</strong> (Sarana Prasarana).</p>
+
+        <h6 class="mt-3">Fitur Utama</h6>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card border-primary mb-2">
+              <div class="card-body py-2">
+                <h6 class="text-primary mb-1"><i class="bi bi-ticket"></i> Tiket Laporan Terpadu</h6>
+                <small class="text-muted">Satu sistem untuk semua laporan — IT (SIMRS) maupun Sarpras (IPSRS). Alur sederhana: Lapor → Ditangani → Selesai.</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card border-info mb-2">
+              <div class="card-body py-2">
+                <h6 class="text-info mb-1"><i class="bi bi-robot"></i> Telegram Bot dengan Tombol</h6>
+                <small class="text-muted">Notifikasi tiket baru dengan tombol "Ambil Tugas" dan "Selesaikan". Teknisi bisa handle tiket penuh dari Telegram.</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card border-success mb-2">
+              <div class="card-body py-2">
+                <h6 class="text-success mb-1"><i class="bi bi-display"></i> Display Monitor Real-Time</h6>
+                <small class="text-muted">Monitor display untuk SIMRS dan IPSRS dengan notifikasi suara, update real-time, dan status petugas.</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card border-warning mb-2">
+              <div class="card-body py-2">
+                <h6 class="text-warning mb-1"><i class="bi bi-graph-up"></i> Laporan Mutu & SLA</h6>
+                <small class="text-muted">Rekap otomatis dengan perhitungan Response Time dan Total Time. Ekspor PDF/Excel.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h6 class="mt-3">Role Pengguna</h6>
+        <table class="table table-bordered table-sm">
+          <thead><tr><th width="100">Role</th><th>Deskripsi</th><th>Hak Akses Utama</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="badge bg-danger">Admin</span></td>
+              <td>Kepala SIMRS / Manajer IT</td>
+              <td>Mengelola semua data (pengguna, unit, kategori, layanan). Mengatur pengaturan sistem, SLA, notifikasi, 2FA. Melihat dashboard analitik lengkap. Menugaskan teknisi.</td>
+            </tr>
+            <tr>
+              <td><span class="badge bg-primary">Teknisi</span></td>
+              <td>Staff IT Support / IPSRS</td>
+              <td>Menerima notifikasi tiket baru via Telegram (dengan tombol ambil tugas). Mengambil tugas, menyelesaikan. Melihat jadwal shift dan laporan mutu.</td>
+            </tr>
+            <tr>
+              <td><span class="badge bg-success">Pelapor</span></td>
+              <td>Perawat, Dokter, Staff</td>
+              <td>Membuat tiket laporan via web. Unit otomatis terisi sesuai ruangan. Melihat status tiket milik sendiri. Memberi rating setelah selesai.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h6 class="mt-3">Alur Tiket Laporan</h6>
+        <div class="d-flex flex-wrap align-items-center gap-1 mb-2">
+          <span class="badge bg-primary">Terbuka</span>
+          <i class="bi bi-arrow-right"></i>
+          <span class="badge bg-info">Dalam Pengerjaan</span>
+          <i class="bi bi-arrow-right"></i>
+          <span class="badge bg-success">Terselesaikan</span>
+          <i class="bi bi-arrow-right"></i>
+          <span class="badge bg-secondary">Ditutup</span>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="badge bg-warning text-dark">Dibuka Ulang</span>
+          <small class="text-muted">— dari status Terselesaikan</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== 2. LOGIN ======================== -->
+    <div class="card mb-4" id="login">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-box-arrow-in-right"></i> 2. Login & Keamanan</h6></div>
+      <div class="card-body">
+        <ol>
+          <li>Buka aplikasi di browser.</li>
+          <li>Masukkan <strong>Username</strong> dan <strong>Password</strong> yang diberikan admin.</li>
+          <li>Klik tombol <span class="badge bg-primary">Masuk</span>.</li>
+          <li>Jika 2FA aktif, masukkan kode OTP dari aplikasi authenticator.</li>
+          <li>Setelah login, Anda diarahkan ke halaman <strong>Dashboard</strong>.</li>
+        </ol>
+        <div class="alert alert-warning py-2 mb-0">
+          <i class="bi bi-exclamation-triangle"></i> <strong>Akun default:</strong>
+          <code>admin / admin123</code>, <code>teknisi1 / teknisi123</code>, <code>pelapor1 / pelapor123</code>.
+          Segera ganti password setelah login pertama.
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== 3. DASHBOARD ======================== -->
+    <div class="card mb-4" id="dashboard">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-speedometer2"></i> 3. Dashboard</h6></div>
+      <div class="card-body">
+        <p>Halaman utama setelah login. Menampilkan ringkasan data real-time.</p>
+        <ul>
+          <li><strong>KPI</strong> — Total tiket, Terbuka, Diproses, Selesai.</li>
+          <li><strong>Grafik</strong> — Tren bulanan, distribusi per status, per unit, per kategori, per prioritas.</li>
+          <li><strong>Tabel Terbaru</strong> — Tiket terbaru.</li>
+          <li><strong>Performa Teknisi</strong> — Nama, tugas aktif, tugas selesai, rata-rata waktu, status.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ======================== 4. TIKET LAPORAN ======================== -->
+    <div class="card mb-4" id="tiket">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-ticket"></i> 4. Tiket Laporan</h6></div>
+      <div class="card-body">
+        <p>Tiket laporan adalah fitur utama untuk melaporkan kerusakan perangkat atau masalah IT/Sarpras di unit Anda.</p>
+
+        <h6 class="mt-3">A. Membuat Tiket Baru (Role: Pelapor/Admin/Teknisi)</h6>
+        <ol>
+          <li>Klik menu <strong>Tiket Laporan</strong> di sidebar.</li>
+          <li>Klik tombol <span class="badge bg-primary"><i class="bi bi-plus-lg"></i> Buat Tiket Baru</span>.</li>
+          <li>Isi <strong>Nama Perangkat / Ruangan</strong> (wajib) — contoh: "Printer Epson L3110 Ruang Bedah".</li>
+          <li>Isi <strong>Deskripsi Kerusakan</strong> (wajib) — jelaskan detail kerusakan.</li>
+          <li><strong>Unit / Ruangan</strong> — otomatis terisi sesuai unit pelapor.</li>
+          <li>Pilih <strong>Layanan</strong> — SIMRS (IT) atau IPSRS (Sarana Prasarana).</li>
+          <li>Pilih <strong>Kategori</strong> — menyesuaikan layanan yang dipilih.</li>
+          <li>Pilih <strong>Prioritas</strong>: Rendah, Sedang, Tinggi, Kritis.</li>
+          <li>Upload <strong>Foto Bukti</strong> (opsional).</li>
+          <li>Klik <span class="badge bg-primary">Kirim Laporan</span>.</li>
+        </ol>
+        <div class="alert alert-success py-2 mb-0">
+          <i class="bi bi-lightning"></i> Setelah tiket dibuat, <strong>semua teknisi</strong> mendapat notifikasi via Telegram (dengan tombol Ambil Tugas) dan via WhatsApp.
+        </div>
+
+        <h6 class="mt-3">B. Memproses Tiket (Role: Teknisi/Admin)</h6>
+        <table class="table table-bordered table-sm">
+          <thead><tr><th>Aksi</th><th>Syarat Status</th><th>Role</th><th>Keterangan</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="badge bg-primary">Ambil Tugas</span></td>
+              <td>Terbuka</td>
+              <td>Admin, Teknisi</td>
+              <td>Teknisi mengambil tiket. Cek kapasitas tugas aktif. Bisa via web atau klik tombol di Telegram.</td>
+            </tr>
+            <tr>
+              <td><span class="badge bg-success">Selesaikan</span></td>
+              <td>Dalam Pengerjaan</td>
+              <td>Admin, Teknisi</td>
+              <td>Tandai selesai. Wajib isi akar penyebab & solusi. Bisa via web atau tombol di Telegram.</td>
+            </tr>
+            <tr>
+              <td><span class="badge bg-warning text-dark">Buka Ulang</span></td>
+              <td>Terselesaikan</td>
+              <td>Semua</td>
+              <td>Jika masalah muncul lagi, tiket bisa dibuka ulang.</td>
+            </tr>
+            <tr>
+              <td><span class="badge bg-info">Tambah Catatan</span></td>
+              <td>Semua</td>
+              <td>Semua</td>
+              <td>Menambahkan komentar/perkembangan.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h6 class="mt-3">C. Filter & Pencarian</h6>
+        <ul>
+          <li>Filter berdasarkan <strong>Status</strong>, <strong>Prioritas</strong>, <strong>Kategori</strong>, atau <strong>Cari</strong> (no.tiket/subjek).</li>
+          <li>Pelapor hanya melihat tiket miliknya sendiri.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ======================== 5. TELEGRAM ======================== -->
+    <div class="card mb-4" id="telegram">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-telegram"></i> 5. Telegram Bot & Inline Keyboard</h6></div>
+      <div class="card-body">
+        <p>Telegram bot memungkinkan teknisi menangani tiket langsung dari Telegram tanpa perlu membuka aplikasi web.</p>
+
+        <h6 class="mt-3">A. Daftarkan Akun Teknisi</h6>
+        <ol>
+          <li>Cari bot Telegram: <strong>@InteligenBot</strong></li>
+          <li>Kirim perintah: <code>/register [username]</code>
+            <br>Contoh: <code>/register teknisi1</code></li>
+          <li>Bot akan mengkonfirmasi bahwa akun Anda terdaftar.</li>
+        </ol>
+
+        <h6 class="mt-3">B. Menerima & Mengambil Tiket</h6>
+        <ul>
+          <li>Saat tiket baru dibuat, bot akan mengirim notifikasi ke semua teknisi terdaftar.</li>
+          <li>Notifikasi berisi: No. Tiket, Perangkat, Unit, Kategori, Prioritas, Deskripsi.</li>
+          <li>Klik tombol <span class="badge bg-success">✅ AMBIL TUGAS</span> untuk mengambil tiket.</li>
+          <li>Status tiket berubah menjadi <strong>Dalam Pengerjaan</strong>.</li>
+          <li>Tombol berubah menjadi <span class="badge bg-warning">🏁 SELESAIKAN</span>.</li>
+        </ul>
+
+        <h6 class="mt-3">C. Menyelesaikan Tiket</h6>
+        <ul>
+          <li>Setelah selesai menangani, klik tombol <span class="badge bg-warning">🏁 SELESAIKAN</span>.</li>
+          <li>Status tiket berubah menjadi <strong>Terselesaikan</strong>.</li>
+          <li>Nama petugas terekam otomatis.</li>
+          <li>Dashboard monitoring dan display update real-time.</li>
+        </ul>
+
+        <h6 class="mt-3">D. Flow Lengkap dari Telegram</h6>
+        <div class="d-flex flex-wrap align-items-center gap-1 mb-2">
+          <span class="badge bg-primary">🔔 Notifikasi Tiket Baru</span>
+          <i class="bi bi-arrow-right"></i>
+          <span class="badge bg-success">✅ AMBIL TUGAS</span>
+          <i class="bi bi-arrow-right"></i>
+          <span class="badge bg-info">📋 Status: Diproses</span>
+          <i class="bi bi-arrow-right"></i>
+          <span class="badge bg-warning">🏁 SELESAIKAN</span>
+          <i class="bi bi-arrow-right"></i>
+          <span class="badge bg-success">✅ Selesai</span>
+        </div>
+
+        <h6 class="mt-3">E. Perintah Lain</h6>
+        <table class="table table-bordered table-sm">
+          <thead><tr><th>Perintah</th><th>Fungsi</th></tr></thead>
+          <tbody>
+            <tr><td><code>/start</code></td><td>Menampilkan menu utama</td></tr>
+            <tr><td><code>/register [username]</code></td><td>Mendaftarkan akun teknisi ke Telegram</td></tr>
+            <tr><td><code>/status</code></td><td>Cek status tiket aktif milik Anda</td></tr>
+            <tr><td><code>/batal</code></td><td>Batalkan proses saat ini</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ======================== 6. RATING ======================== -->
+    <div class="card mb-4" id="rating">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-star"></i> 6. Rating Kepuasan</h6></div>
+      <div class="card-body">
+        <p>Setelah tiket selesai ditangani, pelapor dapat memberikan rating sebagai evaluasi kinerja.</p>
+        <ul>
+          <li>Rating bisa diberikan saat status <span class="badge bg-success">Terselesaikan</span> atau <span class="badge bg-secondary">Ditutup</span>.</li>
+          <li>Hanya <strong>pelapor asli</strong> yang bisa memberi rating.</li>
+          <li>Skala 1-5 bintang, dengan komentar opsional.</li>
+          <li>Rating berkontribusi pada Laporan Mutu.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ======================== 7. NOTIFIKASI ======================== -->
+    <div class="card mb-4" id="notifikasi">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-bell"></i> 7. Notifikasi Real-Time</h6></div>
+      <div class="card-body">
+        <p>Sistem mengirim notifikasi melalui beberapa kanal:</p>
+        <table class="table table-bordered table-sm">
+          <thead><tr><th width="120">Kanal</th><th>Keterangan</th></tr></thead>
+          <tbody>
+            <tr><td><strong>In-App (Socket)</strong></td><td>Notifikasi real-time di navbar (bell icon). Update dashboard & display otomatis.</td></tr>
+            <tr><td><strong>Telegram Bot</strong></td><td>Notifikasi tiket baru dengan tombol ambil tugas. Dikirim ke semua teknisi terdaftar.</td></tr>
+            <tr><td><strong>WhatsApp</strong></td><td>Notifikasi ke nomor WhatsApp teknisi (jika dikonfigurasi).</td></tr>
+            <tr><td><strong>Display Monitor</strong></td><td>Update real-time di monitor display SIMRS/IPSRS dengan notifikasi suara.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ======================== 8. LAPORAN MUTU ======================== -->
+    <div class="card mb-4" id="mutu">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-graph-up"></i> 8. Laporan Mutu & Ekspor</h6></div>
+      <div class="card-body">
+        <p>Menu <strong>Laporan Mutu</strong> menampilkan rekap semua tiket dengan metrik waktu penanganan.</p>
+
+        <h6 class="mt-3">Kolom Laporan</h6>
+        <ul>
+          <li><strong>No. Tiket</strong> — Nomor unik tiket.</li>
+          <li><strong>Unit</strong> — Unit pelapor.</li>
+          <li><strong>Perangkat</strong> — Nama perangkat yang dilaporkan.</li>
+          <li><strong>Prioritas</strong> — Rendah/Sedang/Tinggi/Kritis.</li>
+          <li><strong>Status</strong> — Terbuka/Dalam Pengerjaan/Terselesaikan/Ditutup.</li>
+          <li><strong>Pelapor & Teknisi</strong> — Nama pelapor dan petugas.</li>
+          <li><strong>Tgl Lapor & Tgl Diambil</strong> — Timeline penanganan.</li>
+          <li><strong>Response Time</strong> — Waktu dari tiket dibuat sampai diambil teknisi (jam:menit:detik).</li>
+          <li><strong>Total Time</strong> — Waktu dari tiket dibuat sampai selesai (jam:menit:detik).</li>
+        </ul>
+
+        <h6 class="mt-3">Filter</h6>
+        <ul>
+          <li>Filter berdasarkan <strong>Unit</strong>, <strong>Prioritas</strong>, <strong>Status</strong>, <strong>Periode Tanggal</strong>.</li>
+        </ul>
+
+        <h6 class="mt-3">Ekspor</h6>
+        <ul>
+          <li><span class="badge bg-danger"><i class="bi bi-file-pdf"></i> PDF</span> — Ekspor laporan ke PDF.</li>
+          <li><span class="badge bg-success"><i class="bi bi-file-excel"></i> Excel</span> — Ekspor laporan ke Excel dengan 2 sheet (Data & Rekap).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ======================== 9. DISPLAY MONITOR ======================== -->
+    <div class="card mb-4" id="display">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-display"></i> 9. Display Monitor</h6></div>
+      <div class="card-body">
+        <p>Monitor display untuk menampilkan tiket secara real-time di layar monitor ruang SIMRS/IPSRS.</p>
+
+        <ul>
+          <li><strong>SIMRS Display:</strong> <a href="/display/simrs" target="_blank">/display/simrs</a></li>
+          <li><strong>IPSRS Display:</strong> <a href="/display/ipsrs" target="_blank">/display/ipsrs</a></li>
+        </ul>
+
+        <h6 class="mt-3">Fitur Display</h6>
+        <ul>
+          <li>Update otomatis setiap 10 detik.</li>
+          <li>Notifikasi suara saat ada tiket baru.</li>
+          <li>Animasi slide-in untuk item baru.</li>
+          <li>Kolom menampilkan: No, Tiket, Unit, Deskripsi Masalah, Kategori, Prioritas, Status, Petugas, Jam.</li>
+          <li>Statistik: Baru, Diproses, Selesai, Total Aktif.</li>
+          <li>Mode fullscreen.</li>
+          <li>Nama petugas muncul real-time saat teknisi mengambil tiket.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ======================== 10. ADMIN ======================== -->
+    <div class="card mb-4" id="admin">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-gear"></i> 10. Admin Panel</h6></div>
+      <div class="card-body">
+        <p>Menu admin hanya tersedia untuk pengguna dengan role <span class="badge bg-danger">Admin</span>.</p>
+
+        <div class="table-responsive mb-3"><table class="table table-bordered table-sm">
+          <thead><tr><th>Menu</th><th>Fungsi</th></tr></thead>
+          <tbody>
+            <tr><td><i class="bi bi-people"></i> Pengguna</td><td>Kelola user (Tambah, Edit, Hapus). Atur role, unit, password.</td></tr>
+            <tr><td><i class="bi bi-person-gear"></i> Teknisi</td><td>Atur profil teknisi: spesialisasi, max tugas, Telegram chat ID, nomor WA, status tersedia.</td></tr>
+            <tr><td><i class="bi bi-building"></i> Unit</td><td>Kelola daftar unit/ruangan rumah sakit.</td></tr>
+            <tr><td><i class="bi bi-tags"></i> Kategori</td><td>Kelola kategori perangkat per layanan (SIMRS/IPSRS).</td></tr>
+            <tr><td><i class="bi bi-calendar-week"></i> Jadwal Shift</td><td>Penjadwalan shift teknisi (Pagi/Siang/Malam/Libur).</td></tr>
+            <tr><td><i class="bi bi-layer-group"></i> Layanan</td><td>Kelola layanan (SIMRS, IPSRS).</td></tr>
+            <tr><td><i class="bi bi-gear"></i> Pengaturan</td><td>Konfigurasi: nama RS, logo, Telegram (token, chat ID), WhatsApp, SLA target.</td></tr>
+            <tr><td><i class="bi bi-shield-lock"></i> Keamanan 2FA</td><td>Aktivasi/nonaktifkan autentikasi dua faktor untuk admin.</td></tr>
+            <tr><td><i class="bi bi-journal-text"></i> Log Aktivitas</td><td>Audit trail semua aktivitas pengguna.</td></tr>
+          </tbody>
+        </table></div>
+
+        <h6 class="mt-3">Layanan</h6>
+        <p>Sistem mendukung 2 layanan:</p>
+        <ul>
+          <li><strong>SIMRS</strong> — Sistem Informasi Manajemen RS (IT): komputer, printer, software, jaringan, TV kabel.</li>
+          <li><strong>IPSRS</strong> — Instalasi Pemeliharaan Sarana Prasarana: AC, listrik, alat kesehatan, properti.</li>
+        </ul>
+        <p>Setiap tiket yang dibuat akan memilih layanan dan kategori, dan ditampilkan di display monitor sesuai layanannya.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+document.querySelectorAll('.bantuan-content .list-group-item').forEach(function(link) {
+  link.addEventListener('click', function(e) {
+    document.querySelectorAll('.bantuan-content .list-group-item').forEach(function(l) { l.classList.remove('active'); });
+    this.classList.add('active');
+  });
+});
+</script>

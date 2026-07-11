@@ -1,0 +1,42 @@
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="bi bi-layer-group"></i>
+          <%= layanan ? 'Edit Layanan' : 'Tambah Layanan' %>
+        </h6>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="<%= layanan ? '/admin/layanan/' + layanan.id + '/update' : '/admin/layanan/store' %>" onsubmit="Modal3D.showLoading('Menyimpan...')">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label">Nama Layanan <span class="text-danger">*</span></label>
+            <input type="text" name="nama_layanan" class="form-control" required maxlength="100"
+              value="<%= layanan ? layanan.nama_layanan : '' %>" placeholder="Contoh: SIMRS">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Kode <span class="text-danger">*</span></label>
+            <input type="text" name="kode" class="form-control" required maxlength="20"
+              value="<%= layanan ? layanan.kode : '' %>" placeholder="Contoh: simrs">
+            <small class="text-muted">Kode unik, huruf kecil, tanpa spasi</small>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Deskripsi</label>
+            <textarea name="deskripsi" class="form-control" rows="3" placeholder="Deskripsi singkat layanan..."><%= layanan ? (layanan.deskripsi || '') : '' %></textarea>
+          </div>
+          <% if (layanan) { %>
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="is_active" id="isActive" <%= layanan.is_active ? 'checked' : '' %>>
+              <label class="form-check-label" for="isActive">Aktif</label>
+            </div>
+          </div>
+          <% } %>
+          <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-check-lg"></i> Simpan</button>
+          <a href="/admin/layanan" class="btn btn-secondary btn-3d"><i class="bi bi-arrow-left"></i> Kembali</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

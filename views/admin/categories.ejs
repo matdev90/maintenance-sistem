@@ -1,0 +1,53 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0"><i class="bi bi-tags me-2"></i>Daftar Kategori</h5>
+  <a href="/admin/categories/create" class="btn btn-primary btn-3d">
+    <i class="bi bi-plus-circle"></i> Tambah Kategori
+  </a>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form id="filterForm" class="auto-filter row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small">Pencarian</label>
+        <input type="text" name="q" class="form-control form-control-sm filter-input" placeholder="Nama kategori..." value="<%= (filters && filters.q) || '' %>">
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table table-striped mb-0">
+      <thead>
+        <tr><th style="width:60px">No.</th><th>Nama Kategori</th><th>Layanan</th><th style="width:160px">Aksi</th></tr>
+      </thead>
+      <tbody>
+        <% categories.forEach(function(c, i) { %>
+        <tr>
+          <td><%= ((pagination.currentPage || 1) - 1) * (pagination.limit || 15) + i + 1 %></td>
+          <td><%= c.nama_kategori %></td>
+          <td><%= c.layanan ? c.layanan.nama_layanan : '-' %></td>
+          <td>
+            <a href="/admin/categories/<%= c.id %>/edit" class="btn btn-sm btn-warning">
+              <i class="bi bi-pencil"></i> Edit
+            </a>
+            <form action="/admin/categories/<%= c.id %>/delete" method="POST" style="display:inline">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="button" class="btn btn-sm btn-danger" data-3d-delete data-confirm-msg="Hapus kategori <strong><%= c.nama_kategori %></strong>?<br><small class='text-muted'>Data yang dihapus tidak dapat dikembalikan.</small>">
+                <i class="bi bi-trash"></i> Hapus
+              </button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+        <% if (categories.length === 0) { %>
+        <tr><td colspan="4" class="text-center text-muted py-4">Tidak ada data</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+    <%- include('../partials/pagination', { pagination, filters: filters || {} }) %>
+  </div>
+</div>
+
+

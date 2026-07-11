@@ -1,0 +1,262 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0"><i class="bi bi-file-text"></i> Detail Laporan #<%= report.id %></h6>
+        <span class="badge fs-6 <%= {dilaporkan:'bg-secondary', divalidasi:'bg-info', investigasi:'bg-primary', dalam_perbaikan:'bg-warning', selesai:'bg-success', tidak_valid:'bg-danger', tidak_dapat_diperbaiki:'bg-dark'}[report.status] %>">
+          <%= report.status.replace(/_/g,' ') %>
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <table class="table table-sm">
+              <tr><th>Unit</th><td><%= report.unit ? report.unit.nama_unit : '-' %></td></tr>
+              <tr><th>Kategori</th><td><%= report.kategori ? report.kategori.nama_kategori : '-' %></td></tr>
+              <tr><th>Perangkat</th><td><strong><%= report.nama_perangkat %></strong></td></tr>
+              <tr><th>Prioritas</th>
+                <td>
+                  <span class="badge <%= {ringan:'bg-success', sedang:'bg-warning', berat:'bg-danger', kritis:'bg-dark'}[report.prioritas] %>">
+                    <%= report.prioritas.toUpperCase() %>
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <table class="table table-sm">
+              <tr><th>Pelapor</th><td><%= report.pelapor ? report.pelapor.nama_lengkap : '-' %></td></tr>
+              <tr><th>Tgl Lapor</th><td><%= report.created_at ? new Date(report.created_at).toLocaleString('id-ID') : '-' %></td></tr>
+              <tr><th>Validator</th><td><%= report.validator ? report.validator.nama_lengkap : '-' %></td></tr>
+              <tr><th>Investigator</th><td><%= report.investigator ? report.investigator.nama_lengkap : '-' %></td></tr>
+              <tr><th>Teknisi</th><td><%= report.teknisi ? report.teknisi.nama_lengkap : '-' %></td></tr>
+            </table>
+          </div>
+        </div>
+
+        <% if (report.deskripsi) { %>
+        <div class="mb-3">
+          <label class="fw-bold">Deskripsi Kerusakan:</label>
+          <p class="mb-0"><%= report.deskripsi %></p>
+        </div>
+        <% } %>
+
+        <% if (report.alasan_tidak_valid) { %>
+        <div class="alert alert-danger">
+          <strong>Alasan Tidak Valid:</strong> <%= report.alasan_tidak_valid %>
+        </div>
+        <% } %>
+
+        <% if (report.catatan_teknisi) { %>
+        <div class="mb-3">
+          <label class="fw-bold">Catatan Teknisi:</label>
+          <p class="mb-0"><%= report.catatan_teknisi %></p>
+        </div>
+        <% } %>
+
+        <% if (report.foto) { %>
+        <div class="mb-3">
+          <label class="fw-bold">Foto:</label><br>
+          <img src="/uploads/<%= report.foto %>" class="img-fluid rounded" style="max-height:300px">
+        </div>
+        <% } %>
+      </div>
+    </div>
+
+    <% if (report.status === 'dilaporkan' && user && (user.role === 'admin' || user.role === 'teknisi')) { %>
+    <div class="card mb-3 border-warning">
+      <div class="card-header bg-warning"><h6 class="mb-0"><i class="bi bi-check-circle"></i> Validasi Laporan</h6></div>
+      <div class="card-body">
+        <form method="POST" action="/reports/<%= report.id %>/validasi" class="row g-2">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" name="action" value="valid" class="btn btn-success col-md-3">
+            <i class="bi bi-check-lg"></i> Valid
+          </button>
+          <div class="col-md-6">
+            <input type="text" name="alasan_tidak_valid" class="form-control" placeholder="Alasan jika tidak valid">
+          </div>
+          <button type="submit" name="action" value="tidak_valid" class="btn btn-danger col-md-3"
+            onclick="return confirm('Tandai laporan tidak valid?')">
+            <i class="bi bi-x-lg"></i> Tidak Valid
+          </button>
+        </form>
+      </div>
+    </div>
+    <% } %>
+
+    <% if (report.status === 'divalidasi' && user && (user.role === 'admin' || user.role === 'teknisi')) { %>
+    <div class="card mb-3 border-primary">
+      <div class="card-header bg-primary text-white"><h6 class="mb-0"><i class="bi bi-search"></i> Investigasi</h6></div>
+      <div class="card-body">
+        <form method="POST" action="/reports/<%= report.id %>/investigasi">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <p>Lanjutkan ke tahap investigasi untuk pengecekan awal ke lokasi?</p>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search"></i> Mulai Investigasi
+          </button>
+        </form>
+      </div>
+    </div>
+    <% } %>
+
+    <% if (report.status === 'investigasi' && user && (user.role === 'admin' || user.role === 'teknisi')) { %>
+    <div class="card mb-3 border-success">
+      <div class="card-header bg-success text-white"><h6 class="mb-0"><i class="bi bi-wrench"></i> Ambil Tugas Perbaikan</h6></div>
+      <div class="card-body">
+        <form method="POST" action="/reports/<%= report.id %>/ambil-tugas">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-tools"></i> Ambil Tugas & Mulai Perbaikan
+          </button>
+        </form>
+      </div>
+    </div>
+    <% } %>
+
+    <% if ((report.status === 'dalam_perbaikan' || report.status === 'investigasi') && user && (user.role === 'admin' || user.role === 'teknisi')) { %>
+    <div class="card mb-3 border-info">
+      <div class="card-header bg-info text-white"><h6 class="mb-0"><i class="bi bi-check2-all"></i> Penyelesaian</h6></div>
+      <div class="card-body">
+        <form method="POST" action="/reports/<%= report.id %>/selesai">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label">Catatan Teknisi</label>
+            <textarea name="catatan_teknisi" class="form-control" rows="3" placeholder="Hasil perbaikan / alasan tidak dapat diperbaiki"></textarea>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" name="action" value="selesai" class="btn btn-success">
+              <i class="bi bi-check-lg"></i> Selesai Diperbaiki
+            </button>
+            <button type="submit" name="action" value="tidak_dapat_diperbaiki" class="btn btn-danger"
+              onclick="return confirm('Tandai tidak dapat diperbaiki?')">
+              <i class="bi bi-x-lg"></i> Tidak Dapat Diperbaiki
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <% } %>
+
+    <% if (['selesai', 'tidak_dapat_diperbaiki'].includes(report.status) && user && user.role === 'pelapor' && user.id === report.id_pelapor) { %>
+    <div class="card mb-3 border-warning">
+      <div class="card-header bg-warning"><h6 class="mb-0"><i class="bi bi-star"></i> Rating Kepuasan</h6></div>
+      <div class="card-body">
+        <% if (report.rating) { %>
+        <div class="alert alert-info mb-0">
+          <p class="mb-1">Anda sudah memberikan rating:</p>
+          <div class="mb-1">
+            <% for (var s = 1; s <= 5; s++) { %>
+            <i class="bi bi-star<%= s <= report.rating.bintang ? '-fill text-warning' : ' text-muted' %>"></i>
+            <% } %>
+            <strong class="ms-2"><%= report.rating.bintang %>/5</strong>
+          </div>
+          <% if (report.rating.komentar) { %><p class="mb-0 text-muted"><em>"<%= report.rating.komentar %>"</em></p><% } %>
+        </div>
+        <% } else { %>
+        <form method="POST" action="/ratings/reports/<%= report.id %>">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label">Beri Rating:</label>
+            <div class="rating-stars" id="ratingStars">
+              <% for (var s = 1; s <= 5; s++) { %>
+              <i class="bi bi-star fs-3 text-muted rating-star" data-value="<%= s %>" style="cursor:pointer;" onclick="setRating(<%= s %>)"></i>
+              <% } %>
+              <input type="hidden" name="bintang" id="ratingValue" value="0">
+              <span class="ms-2 text-muted" id="ratingText">Pilih rating</span>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Komentar (opsional)</label>
+            <textarea name="komentar" class="form-control" rows="2" placeholder="Bagaimana penilaian Anda terhadap perbaikan?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-warning btn-3d" id="btnSubmitRating" disabled>
+            <i class="bi bi-send"></i> Kirim Rating
+          </button>
+        </form>
+        <% } %>
+      </div>
+    </div>
+    <% } %>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-clock"></i> Timeline & SLA</h6></div>
+      <div class="card-body">
+        <table class="table table-sm">
+          <tr>
+            <td><span class="badge bg-secondary">Dilaporkan</span></td>
+            <td><%= report.created_at ? new Date(report.created_at).toLocaleString('id-ID') : '-' %></td>
+          </tr>
+          <tr>
+            <td><span class="badge bg-info">Divalidasi</span></td>
+            <td><%= report.tgl_validasi ? new Date(report.tgl_validasi).toLocaleString('id-ID') : '-' %></td>
+          </tr>
+          <tr>
+            <td><span class="badge bg-primary">Investigasi</span></td>
+            <td><%= report.tgl_investigasi ? new Date(report.tgl_investigasi).toLocaleString('id-ID') : '-' %></td>
+          </tr>
+          <tr>
+            <td><span class="badge bg-warning">Diperbaiki</span></td>
+            <td><%= report.tgl_mulai_perbaikan ? new Date(report.tgl_mulai_perbaikan).toLocaleString('id-ID') : '-' %></td>
+          </tr>
+          <tr>
+            <td><span class="badge bg-success">Selesai</span></td>
+            <td><%= report.tgl_selesai ? new Date(report.tgl_selesai).toLocaleString('id-ID') : '-' %></td>
+          </tr>
+        </table>
+
+        <hr>
+        <h6>Waktu Mutu:</h6>
+        <table class="table table-sm">
+          <% 
+          var respTime = report.tgl_validasi && report.created_at ? Math.round((new Date(report.tgl_validasi) - new Date(report.created_at)) / (1000*60*60)) : null;
+          var invTime = report.tgl_investigasi && report.tgl_validasi ? Math.round((new Date(report.tgl_investigasi) - new Date(report.tgl_validasi)) / (1000*60*60)) : null;
+          var repTime = report.tgl_selesai && report.tgl_mulai_perbaikan ? Math.round((new Date(report.tgl_selesai) - new Date(report.tgl_mulai_perbaikan)) / (1000*60*60)) : null;
+          var totTime = report.tgl_selesai && report.created_at ? Math.round((new Date(report.tgl_selesai) - new Date(report.created_at)) / (1000*60*60)) : null;
+          %>
+          <tr><th>Response Time</th><td><%= respTime !== null ? respTime + ' jam' : '-' %></td></tr>
+          <tr><th>Investigation Time</th><td><%= invTime !== null ? invTime + ' jam' : '-' %></td></tr>
+          <tr><th>Repair Time</th><td><%= repTime !== null ? repTime + ' jam' : '-' %></td></tr>
+          <tr><th>Total Resolution</th><td><strong><%= totTime !== null ? totTime + ' jam' : '-' %></strong></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-activity"></i> Riwayat Tracking</h6></div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+          <% if (report.trackings && report.trackings.length) { 
+            report.trackings.forEach(function(t) { %>
+          <li class="list-group-item small">
+            <span class="badge bg-secondary"><%= t.status.replace(/_/g,' ') %></span>
+            <span class="text-muted"><%= t.created_at ? new Date(t.created_at).toLocaleString('id-ID') : '' %></span>
+            <% if (t.catatan) { %><br><em><%= t.catatan %></em><% } %>
+          </li>
+          <% }); } else { %>
+          <li class="list-group-item text-muted">Belum ada riwayat</li>
+          <% } %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function setRating(val) {
+  document.getElementById('ratingValue').value = val;
+  var stars = document.querySelectorAll('.rating-star');
+  stars.forEach(function(star) {
+    var v = parseInt(star.dataset.value);
+    if (v <= val) {
+      star.className = 'bi bi-star-fill fs-3 text-warning rating-star';
+    } else {
+      star.className = 'bi bi-star fs-3 text-muted rating-star';
+    }
+  });
+  var labels = ['', 'Sangat Kurang', 'Kurang', 'Cukup', 'Baik', 'Sangat Baik'];
+  document.getElementById('ratingText').textContent = labels[val] || '';
+  document.getElementById('btnSubmitRating').disabled = false;
+}
+</script>

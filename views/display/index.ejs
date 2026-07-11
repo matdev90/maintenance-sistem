@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Display Monitor - <%= layanan.nama_layanan %></title>
+  <link rel="icon" href="/uploads/<%= (typeof settings !== 'undefined' && settings && settings.logo_rs) ? settings.logo_rs : 'favicon.ico' %>" type="image/png">
+  <link rel="shortcut icon" href="/uploads/<%= (typeof settings !== 'undefined' && settings && settings.logo_rs) ? settings.logo_rs : 'favicon.ico' %>" type="image/png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    .logo-display { height: 40px; width: auto; border-radius: 8px; object-fit: contain; }
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0a0e27; color: #fff; min-height: 100vh; overflow-x: hidden; }
+    .header { background: linear-gradient(135deg, #1a1f4e, #0d1340); padding: 1.5rem 2rem; border-bottom: 2px solid #2a3075; }
+    .header h1 { font-size: 1.8rem; font-weight: 700; }
+    .header .subtitle { opacity: 0.7; font-size: 0.9rem; }
+    #clock { font-size: 1.5rem; font-weight: 700; font-family: 'Courier New', monospace; }
+    .stat-card { border-radius: 12px; padding: 1.2rem; text-align: center; min-width: 120px; }
+    .stat-number { font-size: 2.2rem; font-weight: 800; line-height: 1; }
+    .stat-label { font-size: 0.75rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+    .bg-baru { background: linear-gradient(135deg, #0d6efd, #0b5ed7); }
+    .bg-proses { background: linear-gradient(135deg, #ffc107, #e0a800); color: #333; }
+    .bg-selesai { background: linear-gradient(135deg, #198754, #157347); }
+    .bg-total { background: linear-gradient(135deg, #6f42c1, #5a32a3); }
+    .table-display { font-size: 0.9rem; }
+    .table-display th { background: rgba(255,255,255,0.05); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; color: #fff; }
+    .table-display td { padding: 0.6rem 0.8rem; vertical-align: middle; border-color: rgba(255,255,255,0.05); }
+    .table-display tbody tr { transition: all 0.3s; }
+    .badge-kritis { background: #dc3545; }
+    .badge-berat { background: #fd7e14; }
+    .badge-tinggi { background: #fd7e14; }
+    .badge-sedang { background: #ffc107; color: #333; }
+    .badge-ringan { background: #28a745; }
+    .badge-rendah { background: #28a745; }
+    .badge-baru { background: #0d6efd; }
+    .badge-proses { background: #ffc107; color: #333; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+    .row-new { animation: slideIn 0.5s ease-out; }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateX(20px); } }
+    .row-done { animation: fadeOut 1s ease-in forwards; }
+    @keyframes flashBorder {
+      0% { box-shadow: 0 0 0 0 rgba(102,126,234,0.8); }
+      50% { box-shadow: 0 0 40px 10px rgba(102,126,234,0.3); }
+      100% { box-shadow: 0 0 0 0 rgba(102,126,234,0); }
+    }
+    .flash-new { animation: flashBorder 1s ease-out; }
+    .btn-fullscreen { position: fixed; bottom: 20px; right: 20px; z-index: 9999; border-radius: 50px; }
+    .empty-state { padding: 3rem; text-align: center; opacity: 0.5; }
+    .table-responsive { max-height: calc(100vh - 280px); overflow-y: auto; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-3">
+        <% if (typeof settings !== 'undefined' && settings && settings.logo_rs) { %>
+        <img src="/uploads/<%= settings.logo_rs %>" class="logo-display">
+        <% } %>
+        <div>
+          <h1 class="mb-0">Monitoring Laporan Masuk</h1>
+          <div class="subtitle mt-1"><%= layanan.nama_layanan.toUpperCase() %> — <%= layanan.deskripsi %></div>
+        </div>
+      </div>
+      <div class="text-end">
+        <div id="clock"></div>
+        <div class="subtitle" id="lastUpdate">Memuat data...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid px-4 py-3">
+    <div class="row g-3 mb-3" id="statsRow">
+      <div class="col">
+        <div class="stat-card bg-baru">
+          <div class="stat-number" id="statBaru">0</div>
+          <div class="stat-label">Baru</div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="stat-card bg-proses">
+          <div class="stat-number" id="statProses">0</div>
+          <div class="stat-label">Diproses</div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="stat-card bg-selesai">
+          <div class="stat-number" id="statSelesai">0</div>
+          <div class="stat-label">Selesai</div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="stat-card bg-total">
+          <div class="stat-number" id="statTotal">0</div>
+          <div class="stat-label">Total Aktif</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-display mb-0">
+            <thead>
+              <tr>
+                <th style="width:30px">No</th>
+                <th>TIKET</th>
+                <th>Unit</th>
+                <th>Deskripsi Masalah</th>
+                <th>Kategori</th>
+                <th>Prioritas</th>
+                <th>Status</th>
+                <th>Petugas</th>
+                <th style="width:60px">Jam</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr><td colspan="9" class="empty-state"><i class="bi bi-inbox" style="font-size:2rem"></i><br>Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button id="btnFullscreen" class="btn btn-sm btn-outline-light btn-fullscreen">
+    <i class="bi bi-fullscreen"></i> Fullscreen
+  </button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+  (function() {
+    var KODE_LAYANAN = '<%= layanan.kode %>';
+    var notifAudio = new Audio('/audio/notif-new.mp3');
+    var soundEnabled = localStorage.getItem('display_sound_' + KODE_LAYANAN) !== 'false';
+    var knownIds = new Set();
+
+    // Web Audio beep generator
+    var audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(function(){});
+      }
+    }
+    function beep(freq, duration) {
+      try {
+        if (!audioCtx) return;
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function playBeep() {
+      try {
+        notifAudio.currentTime = 0;
+        notifAudio.play().catch(function() { initAudio(); beep(880, 0.2); setTimeout(function() { beep(660, 0.2); }, 150); });
+      } catch(e) { initAudio(); beep(880, 0.2); setTimeout(function() { beep(660, 0.2); }, 150); }
+    }
+
+    // Clock (HH:mm)
+    function updateClock() {
+      var d = new Date();
+      document.getElementById('clock').textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Fullscreen + init audio on user gesture
+    document.getElementById('btnFullscreen').addEventListener('click', function() {
+      initAudio();
+      var el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    });
+
+    // Priority badge
+    function priorityBadge(p) {
+      var cls = { kritis: 'badge-kritis', berat: 'badge-berat', tinggi: 'badge-tinggi', sedang: 'badge-sedang', ringan: 'badge-ringan', rendah: 'badge-rendah' };
+      return '<span class="badge ' + (cls[p] || 'bg-secondary') + '">' + p.toUpperCase() + '</span>';
+    }
+
+    // Status badge
+    function statusBadge(s) {
+      var labels = {
+        'open': 'Terbuka', 'in_progress': 'Dalam Pengerjaan',
+        'resolved': 'Terselesaikan', 'closed': 'Ditutup', 'reopened': 'Dibuka Ulang',
+        'dilaporkan': 'Dilaporkan', 'divalidasi': 'Divalidasi',
+        'investigasi': 'Investigasi', 'dalam_perbaikan': 'Dalam Perbaikan',
+        'selesai': 'Selesai', 'tidak_valid': 'Tidak Valid',
+        'tidak_dapat_diperbaiki': 'Tidak Dapat Diperbaiki'
+      };
+      var baru = ['dilaporkan', 'open'];
+      var proses = ['divalidasi', 'investigasi', 'dalam_perbaikan', 'in_progress', 'reopened'];
+      var cls = baru.includes(s) ? 'badge-baru' : proses.includes(s) ? 'badge-proses' : 'bg-success';
+      return '<span class="badge ' + cls + '">' + (labels[s] || s) + '</span>';
+    }
+
+    // Time format (HH:mm)
+    function timeFormat(dt) {
+      var d = new Date(dt);
+      return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    }
+
+    // Update stats
+    function updateStats(stats) {
+      document.getElementById('statBaru').textContent = stats.baru;
+      document.getElementById('statProses').textContent = stats.proses;
+      document.getElementById('statSelesai').textContent = stats.selesai;
+      document.getElementById('statTotal').textContent = stats.total;
+    }
+
+    // Render table
+    function renderTable(items) {
+      var tbody = document.getElementById('tableBody');
+      if (!items || items.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="bi bi-inbox" style="font-size:2rem"></i><br>Belum ada laporan</td></tr>';
+        return;
+      }
+      var html = '';
+      items.forEach(function(item, i) {
+        var teknisiHtml = item.teknisi ? '<span class="badge bg-info">' + item.teknisi + '</span>' : '<span class="text-muted">-</span>';
+        html += '<tr data-id="' + item.type + '_' + item.id + '">' +
+          '<td>' + (i + 1) + '</td>' +
+          '<td><strong>' + item.no + '</strong></td>' +
+          '<td>' + item.unit + '</td>' +
+          '<td>' + (item.deskripsi || item.perangkat || '-') + '</td>' +
+          '<td>' + item.kategori + '</td>' +
+          '<td>' + priorityBadge(item.prioritas) + '</td>' +
+          '<td>' + statusBadge(item.status) + '</td>' +
+          '<td>' + teknisiHtml + '</td>' +
+          '<td>' + timeFormat(item.waktu) + '</td>' +
+          '</tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    // Load data
+    function loadData() {
+      fetch('/display/' + KODE_LAYANAN + '/data')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.error) return;
+          var newIds = new Set();
+          data.items.forEach(function(item) { newIds.add(item.type + '_' + item.id); });
+
+          // Detect new items
+          newIds.forEach(function(id) {
+            if (!knownIds.has(id) && knownIds.size > 0) {
+              var el = document.querySelector('[data-id="' + id + '"]');
+              if (el) el.classList.add('row-new');
+              document.querySelector('.card') && document.querySelector('.card').classList.add('flash-new');
+              setTimeout(function() { document.querySelector('.card') && document.querySelector('.card').classList.remove('flash-new'); }, 1000);
+              if (soundEnabled) playBeep();
+            }
+          });
+
+          knownIds = newIds;
+          renderTable(data.items);
+          updateStats(data.stats);
+          (function(now) { document.getElementById('lastUpdate').textContent = 'Terakhir diperbarui: ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0'); })(new Date());
+        })
+        .catch(function(e) { console.error('Load error:', e); });
+    }
+
+    // Initial load
+    loadData();
+
+    // Auto-refresh setiap 10 detik
+    setInterval(loadData, 10000);
+
+    // Socket.IO
+    var socket = io();
+    socket.on('new_report_layanan', function(data) {
+      if (data.kode_layanan === KODE_LAYANAN) {
+        loadData();
+      }
+    });
+    socket.on('report_update_layanan', function(data) {
+      if (data.kode_layanan === KODE_LAYANAN) {
+        loadData();
+      }
+    });
+  })();
+  </script>
+</body>
+</html>

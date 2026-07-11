@@ -1,0 +1,56 @@
+<div class="sidebar-heading">Menu</div>
+<ul class="nav flex-column mb-3">
+  <li class="nav-item">
+    <a class="nav-link" href="/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/tickets"><i class="bi bi-ticket"></i> Tiket Laporan</a>
+  </li>
+  <% if (user && user.role !== 'pelapor') { %>
+  <li class="nav-item">
+    <a class="nav-link" href="/export/laporan-mutu"><i class="bi bi-graph-up"></i> Laporan Mutu</a>
+  </li>
+  <% } %>
+</ul>
+
+<% if (user && user.role === 'admin') { %>
+<div class="sidebar-heading">Admin</div>
+<ul class="nav flex-column">
+  <li class="nav-item">
+    <a class="nav-link" href="/admin/users"><i class="bi bi-people"></i> Pengguna</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/admin/technicians"><i class="bi bi-person-gear"></i> Teknisi</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/admin/units"><i class="bi bi-building"></i> Unit</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/admin/categories"><i class="bi bi-tags"></i> Kategori</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/admin/bantuan"><i class="bi bi-question-circle"></i> Bantuan</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/admin/layanan"><i class="bi bi-grid-3x3-gap"></i> Layanan</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/admin/settings"><i class="bi bi-gear"></i> Pengaturan</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/admin/2fa"><i class="bi bi-shield-lock"></i> Keamanan 2FA</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/admin/logs"><i class="bi bi-journal-text"></i> Log Aktivitas</a>
+  </li>
+</ul>
+<div class="sidebar-heading">Display</div>
+<ul class="nav flex-column">
+  <li class="nav-item">
+    <a class="nav-link" href="/display/simrs" target="_blank"><i class="bi bi-display"></i> Display SIMRS</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/display/ipsrs" target="_blank"><i class="bi bi-display"></i> Display IPSRS</a>
+  </li>
+</ul>
+<% } %>

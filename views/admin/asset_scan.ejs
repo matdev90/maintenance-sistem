@@ -1,0 +1,89 @@
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-qr-code-scan"></i> Scan QR Code Aset</h6></div>
+      <div class="card-body text-center">
+        <div class="mb-4">
+          <div class="input-group input-group-lg">
+            <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
+            <input type="text" id="scanInput" class="form-control form-control-lg" placeholder="Arahkan kursor ke sini, lalu scan QR Code" autofocus>
+            <button class="btn btn-primary btn-3d" onclick="lookupAsset()"><i class="bi bi-search"></i></button>
+          </div>
+          <small class="text-muted">Atau ketik kode aset secara manual (contoh: AST-0001)</small>
+        </div>
+
+        <div id="scanResult" style="display:none;">
+          <hr>
+          <div class="alert alert-success">
+            <h5><i class="bi bi-check-circle"></i> Aset Ditemukan!</h5>
+          </div>
+          <table class="table table-sm text-start">
+            <tr><th width="120">Kode</th><td id="resultKode"></td></tr>
+            <tr><th>Nama</th><td id="resultNama"></td></tr>
+            <tr><th>Kategori</th><td id="resultKategori"></td></tr>
+            <tr><th>Unit</th><td id="resultUnit"></td></tr>
+            <tr><th>Merk</th><td id="resultMerk"></td></tr>
+            <tr><th>Kondisi</th><td id="resultKondisi"></td></tr>
+          </table>
+          <div class="d-flex gap-2 justify-content-center">
+            <a id="resultLaporLink" href="/reports/create" class="btn btn-warning btn-3d"><i class="bi bi-exclamation-triangle"></i> Laporkan Kerusakan</a>
+            <button onclick="resetScan()" class="btn btn-secondary btn-3d"><i class="bi bi-arrow-counterclockwise"></i> Scan Lagi</button>
+          </div>
+        </div>
+
+        <div id="scanNotFound" style="display:none;">
+          <hr>
+          <div class="alert alert-danger">
+            <h5><i class="bi bi-x-circle"></i> Aset Tidak Ditemukan</h5>
+            <p class="mb-0">Kode aset tidak terdaftar dalam sistem.</p>
+          </div>
+          <button onclick="resetScan()" class="btn btn-secondary btn-3d"><i class="bi bi-arrow-counterclockwise"></i> Coba Lagi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('scanInput').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    lookupAsset();
+  }
+});
+
+function lookupAsset() {
+  var kode = document.getElementById('scanInput').value.trim();
+  if (!kode) return;
+
+  fetch('/assets/lookup?kode=' + encodeURIComponent(kode))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.found) {
+        document.getElementById('resultKode').textContent = data.kode_asset;
+        document.getElementById('resultNama').textContent = data.nama_perangkat;
+        document.getElementById('resultKategori').textContent = data.nama_kategori || '-';
+        document.getElementById('resultUnit').textContent = data.nama_unit || '-';
+        document.getElementById('resultMerk').textContent = (data.merk || '-') + ' ' + (data.model || '');
+        document.getElementById('resultKondisi').textContent = data.kondisi.replace(/_/g, ' ');
+        document.getElementById('resultLaporLink').href = '/reports/create?asset=' + data.id;
+        document.getElementById('scanResult').style.display = 'block';
+        document.getElementById('scanNotFound').style.display = 'none';
+      } else {
+        document.getElementById('scanResult').style.display = 'none';
+        document.getElementById('scanNotFound').style.display = 'block';
+      }
+    })
+    .catch(function() {
+      document.getElementById('scanResult').style.display = 'none';
+      document.getElementById('scanNotFound').style.display = 'block';
+    });
+}
+
+function resetScan() {
+  document.getElementById('scanInput').value = '';
+  document.getElementById('scanInput').focus();
+  document.getElementById('scanResult').style.display = 'none';
+  document.getElementById('scanNotFound').style.display = 'none';
+}
+</script>

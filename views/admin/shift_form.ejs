@@ -1,0 +1,108 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-calendar-week"></i> <%= shift ? 'Edit' : 'Tambah' %> Jadwal Shift</h6></div>
+      <div class="card-body">
+        <form method="POST" action="<%= shift ? '/admin/shifts/' + shift.id + '/update' : '/admin/shifts/store' %>" onsubmit="Modal3D.showLoading()">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <% if (!shift) { %>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Tanggal Mulai *</label>
+              <input type="date" name="tanggal_mulai" class="form-control" value="<%= new Date().toISOString().split('T')[0] %>" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Tanggal Selesai</label>
+              <input type="date" name="tanggal_selesai" class="form-control" value="<%= new Date().toISOString().split('T')[0] %>">
+              <small class="text-muted">Kosongkan jika hanya 1 hari</small>
+            </div>
+          </div>
+          <% } else { %>
+          <div class="mb-3">
+            <label class="form-label">Tanggal *</label>
+            <input type="date" name="tanggal" class="form-control" value="<%= shift.tanggal %>" required>
+          </div>
+          <% } %>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Layanan *</label>
+              <select name="id_layanan" class="form-select" required id="selectLayananForm" onchange="filterShiftByLayanan()">
+                <option value="">Pilih Layanan</option>
+                <% layanans.forEach(function(l) { %>
+                <option value="<%= l.kode %>" data-id="<%= l.id %>" <%= (shift && shift.id_layanan == l.id) ? 'selected' : '' %>><%= l.nama_layanan %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Shift *</label>
+              <select name="shift" class="form-select" required id="selectShiftForm">
+                <option value="pagi" <%= (shift && shift.shift === 'pagi') ? 'selected' : '' %>>Pagi</option>
+                <option value="siang" class="opt-ipsrs" <%= (shift && shift.shift === 'siang') ? 'selected' : '' %>>Siang</option>
+                <option value="malam" class="opt-ipsrs" <%= (shift && shift.shift === 'malam') ? 'selected' : '' %>>Malam</option>
+                <option value="libur" <%= (shift && shift.shift === 'libur') ? 'selected' : '' %>>Libur</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Teknisi *<% if (!shift) { %> (bisa pilih lebih dari satu) <% } %></label>
+            <% if (!shift) { %>
+            <div class="border rounded p-3" style="max-height:200px; overflow-y:auto;">
+              <% technicians.forEach(function(t) { %>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="id_teknisi" value="<%= t.id %>" id="tek_<%= t.id %>">
+                <label class="form-check-label" for="tek_<%= t.id %>"><%= t.nama_lengkap %></label>
+              </div>
+              <% }); %>
+            </div>
+            <% } else { %>
+            <select name="id_teknisi" class="form-select" required>
+              <option value="">Pilih Teknisi</option>
+              <% technicians.forEach(function(t) { %>
+              <option value="<%= t.id %>" <%= shift.id_teknisi === t.id ? 'selected' : '' %>><%= t.nama_lengkap %></option>
+              <% }); %>
+            </select>
+            <% } %>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <label class="form-label">Jam Mulai</label>
+              <input type="time" name="jam_mulai" class="form-control" value="<%= shift ? (shift.jam_mulai || '') : '08:00' %>">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Jam Selesai</label>
+              <input type="time" name="jam_selesai" class="form-control" value="<%= shift ? (shift.jam_selesai || '') : '16:00' %>">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Catatan</label>
+            <textarea name="catatan" class="form-control" rows="3"><%= shift ? (shift.catatan || '') : '' %></textarea>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-check-lg"></i> Simpan</button>
+            <a href="/admin/shifts" class="btn btn-secondary btn-3d"><i class="bi bi-arrow-left"></i> Kembali</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function filterShiftByLayanan() {
+  var sel = document.getElementById('selectLayananForm');
+  var kode = sel.value;
+  var shiftSel = document.getElementById('selectShiftForm');
+  var ipsrsOptions = shiftSel.querySelectorAll('.opt-ipsrs');
+  ipsrsOptions.forEach(function(o) { o.style.display = kode === 'ipsrs' ? 'block' : 'none'; });
+  if (kode !== 'ipsrs' && (shiftSel.value === 'siang' || shiftSel.value === 'malam')) {
+    shiftSel.value = 'pagi';
+  }
+}
+filterShiftByLayanan();
+</script>

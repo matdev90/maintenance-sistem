@@ -1,0 +1,81 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <a href="/admin/shifts/create" class="btn btn-primary btn-3d"><i class="bi bi-plus-lg"></i> Tambah Jadwal</a>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="GET" action="/admin/shifts" class="auto-filter row g-2">
+      <div class="col-md-2">
+        <select name="bulan" class="form-select form-select-sm">
+          <% months.forEach(function(m, i) { %>
+          <option value="<%= i + 1 %>" <%= filters.bulan === (i + 1) ? 'selected' : '' %>><%= m %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="tahun" class="form-select form-select-sm">
+          <% var startYear = new Date().getFullYear() - 1; %>
+          <% for (var y = startYear; y <= startYear + 3; y++) { %>
+          <option value="<%= y %>" <%= filters.tahun === y ? 'selected' : '' %>><%= y %></option>
+          <% } %>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select name="teknisi" class="form-select form-select-sm">
+          <option value="">Semua Teknisi</option>
+          <% technicians.forEach(function(t) { %>
+          <option value="<%= t.id %>" <%= filters.teknisi == t.id ? 'selected' : '' %>><%= t.nama_lengkap %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="col-md-5 d-flex gap-2">
+        <button type="submit" class="btn btn-sm btn-primary btn-3d"><i class="bi bi-search"></i> Filter</button>
+        <a href="/admin/shifts" class="btn btn-sm btn-outline-secondary btn-3d">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0 table-datatable">
+      <thead>
+        <tr>
+          <th width="40">No</th>
+          <th>Tanggal</th>
+          <th>Teknisi</th>
+          <th>Layanan</th>
+          <th>Shift</th>
+          <th>Jam</th>
+          <th>Catatan</th>
+          <th width="120">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (shifts.length) { shifts.forEach(function(s, i) { %>
+        <tr>
+          <td><%= i + 1 %></td>
+          <td><%= new Date(s.tanggal).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) %></td>
+          <td><%= s.teknisi ? s.teknisi.nama_lengkap : '-' %></td>
+          <td><%= s.layanan ? s.layanan.nama_layanan : '-' %></td>
+          <td>
+            <% var shiftBadge = {pagi:'bg-primary', siang:'bg-warning', malam:'bg-purple', libur:'bg-secondary'}; %>
+            <span class="badge <%= shiftBadge[s.shift] || 'bg-primary' %>" style="<%= s.shift === 'malam' ? 'background-color:#6f42c1;' : (s.shift === 'siang' ? 'color:#000;' : '') %>"><%= s.shift.charAt(0).toUpperCase() + s.shift.slice(1) %></span>
+          </td>
+          <td><%= s.jam_mulai || '-' %> - <%= s.jam_selesai || '-' %></td>
+          <td><%= s.catatan || '-' %></td>
+          <td>
+            <a href="/admin/shifts/<%= s.id %>/edit" class="btn btn-sm btn-outline-primary btn-3d" title="Edit"><i class="bi bi-pencil"></i></a>
+            <form method="POST" action="/admin/shifts/<%= s.id %>/delete" class="d-inline" onsubmit="return confirm('Hapus jadwal shift ini?')">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-sm btn-outline-danger btn-3d" title="Hapus"><i class="bi bi-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+        <% }); } %>
+      </tbody>
+    </table>
+  </div>
+</div>

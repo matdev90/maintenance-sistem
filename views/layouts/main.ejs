@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - SIMRS Maintenance</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" href="/css/anim-3d.css">
+  <link rel="icon" href="/uploads/<%= (settings && settings.logo_rs) ? settings.logo_rs : 'favicon.ico' %>" type="image/png">
+  <link rel="shortcut icon" href="/uploads/<%= (settings && settings.logo_rs) ? settings.logo_rs : 'favicon.ico' %>" type="image/png">
+  <style>
+    body { font-size: .875rem; background: #f4f6fb; }
+    .sidebar { position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; padding: 48px 0 0; box-shadow: inset -1px 0 0 rgba(0,0,0,.1); background: linear-gradient(180deg, #0c0e1a 0%, #1a1040 100%) !important; }
+    .sidebar .nav-link { font-weight: 500; color: rgba(255,255,255,0.7); padding: .7rem 1rem; border-left: 3px solid transparent; transition: all 0.3s ease; }
+    .sidebar .nav-link:hover { background: rgba(255,255,255,0.05); color: white; border-left-color: #667eea; }
+    .sidebar .nav-link.active { color: #667eea; background: rgba(102,126,234,0.1); border-left-color: #667eea; }
+    .sidebar .nav-link .bi { margin-right: 10px; }
+    .sidebar .sidebar-heading { color: rgba(255,255,255,0.4); font-size: .7rem; text-transform: uppercase; letter-spacing: 1px; padding: 1rem 1rem .5rem; }
+    main { padding-top: 48px; }
+    .badge-status { font-size: .75rem; }
+    .flash-container { position: fixed; top: 60px; right: 20px; z-index: 9999; min-width: 300px; }
+    .content-header { padding: 0 0 1rem 0; }
+    .card-dashboard { border-left: 4px solid; border-radius: 12px; transition: all 0.3s ease; }
+    .card-dashboard:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+    .navbar-main { background: linear-gradient(135deg, #0c0e1a 0%, #1a1040 100%) !important; box-shadow: 0 2px 20px rgba(0,0,0,0.2); }
+    .card { border: none; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: all 0.3s ease; }
+    .card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+    .card-header { background: transparent; border-bottom: 1px solid rgba(0,0,0,0.05); font-weight: 600; border-radius: 16px 16px 0 0 !important; }
+    .btn { border-radius: 10px; font-weight: 500; transition: all 0.3s ease; }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+    table { border-radius: 12px; overflow: hidden; }
+    .table th { background: #f8f9ff; font-weight: 600; }
+    .notif-menu::-webkit-scrollbar { width: 6px; }
+    .notif-menu::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+    .notif-item { border-bottom: 1px solid #f0f0f0; transition: background 0.2s; }
+    .notif-item:hover { background: #f0f2ff; }
+    .notif-dot { width: 8px; height: 8px; background: #667eea; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .text-light-50 { color: rgba(255,255,255,0.75); }
+
+    /* Mobile sidebar drawer */
+    .mobile-sidebar { width: 280px; background: linear-gradient(180deg, #0c0e1a 0%, #1a1040 100%) !important; border-right: none; }
+    .mobile-sidebar .sidebar-heading { color: rgba(255,255,255,0.4); font-size: .7rem; text-transform: uppercase; letter-spacing: 1px; padding: 1rem 1rem .5rem; }
+    .mobile-sidebar .nav-link { font-weight: 500; color: rgba(255,255,255,0.7); padding: .7rem 1rem; border-left: 3px solid transparent; transition: all 0.3s ease; }
+    .mobile-sidebar .nav-link:hover { background: rgba(255,255,255,0.05); color: white; border-left-color: #667eea; }
+    .mobile-sidebar .nav-link.active { color: #667eea; background: rgba(102,126,234,0.1); border-left-color: #667eea; }
+    .mobile-sidebar .nav-link .bi { margin-right: 10px; }
+    .btn-sidebar-toggle { font-size: 1.1rem; padding: .3rem .5rem; }
+
+    /* Mobile navbar compact */
+    @media (max-width: 767.98px) {
+      .navbar-main .navbar-brand { display: none !important; }
+      .navbar-main .user-info { display: none; }
+      .navbar-main .btn-logout-text { display: none; }
+      .navbar-main .btn-logout-icon { display: inline-flex !important; }
+      .navbar-main .d-flex { gap: .4rem !important; }
+      .navbar-brand-text-mobile {
+        position: absolute;
+        left: 50%;
+        transform: translateX(calc(-50% - 16px));
+        font-size: .85rem;
+        font-weight: 700;
+        color: rgba(255,255,255,0.9);
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        pointer-events: none;
+      }
+    }
+    @media (min-width: 768px) {
+      .navbar-brand-text-mobile { display: none !important; }
+      .btn-logout-icon { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="flash-container" style="display:none">
+    <% if (success && success.length) { %>
+      <div class="flash-success" data-flash-msg="<%= success[0] %>"></div>
+    <% } %>
+    <% if (error && error.length) { %>
+      <div class="flash-error" data-flash-msg="<%= error[0] %>"></div>
+    <% } %>
+  </div>
+
+  <!-- 3D Loading Overlay -->
+  <div class="loading-3d" id="loading3d">
+    <div class="loading-3d-spinner">
+      <div class="spinner-3d-cube">
+        <div class="face front"><i class="bi bi-tools"></i></div>
+        <div class="face back"><i class="bi bi-tools"></i></div>
+        <div class="face right"><i class="bi bi-tools"></i></div>
+        <div class="face left"><i class="bi bi-tools"></i></div>
+        <div class="face top"><i class="bi bi-tools"></i></div>
+        <div class="face bottom"><i class="bi bi-tools"></i></div>
+      </div>
+      <div class="particle-container">
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+      </div>
+      <div class="loading-3d-text" id="loading3dText">MEMPROSES...</div>
+    </div>
+  </div>
+
+  <!-- 3D Modal -->
+  <div class="modal fade modal-3d" id="modal3dConfirm" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="modal-icon-float bi bi-question-circle me-2"></i>
+            <span class="modal-title-text">Konfirmasi</span>
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center py-4">
+          <i class="modal-icon bi bi-question-circle"></i>
+          <p class="modal-body-msg mt-3 mb-0 fs-5">Apakah Anda yakin?</p>
+        </div>
+        <div class="modal-footer justify-content-center border-0 pt-0">
+          <button type="button" class="btn btn-secondary btn-3d px-4 btn-3d-cancel" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg me-1"></i> Batal
+          </button>
+          <button type="button" class="btn btn-primary btn-3d px-4 btn-3d-confirm">
+            <i class="bi bi-check-lg me-1"></i> Ya
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="navbar navbar-dark navbar-main fixed-top">
+    <div class="container-fluid position-relative">
+      <button class="btn btn-sm btn-outline-light btn-sidebar-toggle d-md-none me-2" type="button" id="btnMobileSidebar" aria-label="Menu">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="navbar-brand fw-bold d-none d-md-inline-flex" href="/dashboard">
+        <% if (settings && settings.logo_rs) { %>
+        <img src="/uploads/<%= settings.logo_rs %>" style="height:28px; width:28px; object-fit:contain; border-radius:8px;" class="me-2">
+        <% } else { %>
+        <i class="bi bi-tools me-2"></i>
+        <% } %>
+        <%= (settings && settings.nama_rs) ? settings.nama_rs : 'SIMRS Maintenance' %>
+      </a>
+      <span class="navbar-brand-text-mobile d-md-none">
+        <% if (settings && settings.logo_rs) { %>
+        <img src="/uploads/<%= settings.logo_rs %>" style="height:20px; width:20px; object-fit:contain; border-radius:6px;" class="me-2">
+        <% } %>
+        <%= (settings && settings.nama_rs) ? settings.nama_rs : 'SIMRS Maintenance' %>
+      </span>
+      <div class="d-flex align-items-center gap-2">
+        <!-- Notification Bell -->
+        <div class="dropdown" id="notifDropdown">
+          <button class="btn btn-sm btn-outline-light position-relative btn-3d" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="notifBell">
+            <i class="bi bi-bell"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notif-badge" style="font-size:0.6rem; display:none;" id="notifCount">0</span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-end shadow-lg notif-menu" style="width:350px; max-height:450px; overflow-y:auto; border-radius:16px; border:none;">
+            <div class="dropdown-header fw-bold" style="font-size:0.85rem;">Notifikasi</div>
+            <div id="notifList"><div class="dropdown-item text-muted small text-center py-3">Tidak ada notifikasi</div></div>
+            <div class="dropdown-divider m-0"></div>
+            <button class="dropdown-item text-center small text-primary" id="markAllRead" style="border-radius:0 0 16px 16px;">
+              <i class="bi bi-check-all me-1"></i>Tandai semua sudah dibaca
+            </button>
+          </div>
+        </div>
+
+        <span class="text-light-50 small user-info">
+          <i class="bi bi-person-circle me-1"></i><%= user ? user.nama_lengkap : '' %>
+          <span class="badge bg-info bg-opacity-25 text-info ms-1"><%= user ? user.role : '' %></span>
+        </span>
+        <a href="/auth/logout" class="btn btn-sm btn-outline-light btn-3d btn-logout-text" data-3d-logout>
+          <i class="bi bi-box-arrow-right"></i> Keluar
+        </a>
+        <a href="/auth/logout" class="btn btn-sm btn-outline-light btn-3d btn-logout-icon" data-3d-logout title="Keluar">
+          <i class="bi bi-box-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <nav class="col-md-2 d-none d-md-block sidebar">
+        <div class="d-flex flex-column h-100 pt-3 overflow-hidden">
+          <div class="flex-grow-1 overflow-y-auto">
+            <%- include('partials/sidebar_nav') %>
+          </div>
+          <div class="text-center py-2 border-top border-secondary border-opacity-25 flex-shrink-0">
+            <small class="text-light-50" style="font-size:0.65rem;">v<%= typeof version !== 'undefined' ? version : '1.0.0' %></small>
+          </div>
+        </div>
+      </nav>
+
+      <main class="col-md-10 ms-sm-auto px-4">
+        <div class="content-header pt-3 pb-2">
+          <h4><%= title %></h4>
+        </div>
+        <%- body %>
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile Offcanvas Sidebar -->
+  <div class="offcanvas offcanvas-start mobile-sidebar" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
+    <div class="offcanvas-header border-0 pb-0">
+      <h6 class="offcanvas-title text-white fw-bold" id="mobileSidebarLabel">
+        <i class="bi bi-tools me-2"></i><%= (settings && settings.nama_rs) ? settings.nama_rs : 'SIMRS' %>
+      </h6>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-0 pt-2">
+      <%- include('partials/sidebar_nav') %>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Mobile sidebar toggle
+    var mobileSidebarEl = document.getElementById('mobileSidebar');
+    var mobileSidebar = mobileSidebarEl ? new bootstrap.Offcanvas(mobileSidebarEl) : null;
+    document.getElementById('btnMobileSidebar').addEventListener('click', function() {
+      if (mobileSidebar) mobileSidebar.toggle();
+    });
+    // Set active link in mobile sidebar
+    if (mobileSidebarEl) {
+      mobileSidebarEl.querySelectorAll('.nav-link').forEach(function(link) {
+        if (link.href.replace(/\/$/, '') === window.location.href.replace(/\/$/, '')) {
+          link.classList.add('active');
+        }
+      });
+    }
+  </script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/modal-3d.js?v=4"></script>
+  <script>
+    var socket = io();
+    <% if (user) { %>
+    socket.emit('register', '<%= user.id %>');
+    <% } %>
+
+    socket.on('new_notification', function(notif) {
+      var badge = $('#notifCount');
+      var current = parseInt(badge.text()) || 0;
+      badge.text(current + 1).show();
+
+      if (typeof Modal3D !== 'undefined') {
+        Modal3D.showAlert({ type: 'info', title: notif.title, message: notif.message });
+      }
+
+      if (Notification && Notification.permission === 'granted') {
+        new Notification(notif.title, { body: notif.message, icon: '/favicon.ico' });
+      }
+    });
+
+    $(document).ready(function() {
+      $('.table-datatable').DataTable({ language: {
+        search: 'Cari:',
+        lengthMenu: 'Tampilkan _MENU_ data',
+        info: 'Menampilkan _START_ - _END_ dari _TOTAL_ data',
+        infoEmpty: 'Tidak ada data',
+        infoFiltered: '(disaring dari _MAX_ total data)',
+        zeroRecords: 'Tidak ada data yang cocok',
+        emptyTable: 'Tidak ada data yang tersedia',
+        paginate: { first: 'Pertama', last: 'Terakhir', next: 'Berikutnya', previous: 'Sebelumnya' }
+      } });
+
+      var successEl = document.querySelector('.flash-success');
+      var errorEl = document.querySelector('.flash-error');
+      if (successEl && successEl.dataset.flashMsg) {
+        setTimeout(function() {
+          Modal3D.showAlert({ type: 'success', title: 'Berhasil', message: successEl.dataset.flashMsg });
+        }, 300);
+      } else if (errorEl && errorEl.dataset.flashMsg) {
+        setTimeout(function() {
+          Modal3D.showAlert({ type: 'error', title: 'Gagal', message: errorEl.dataset.flashMsg });
+        }, 300);
+      }
+
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    });
+
+    // Socket.IO handles real-time notifications now
+    // Fallback polling for badge count (in case socket disconnects)
+    function pollNotif() {
+      $.get('/notifications/count', function(r) {
+        const badge = $('#notifCount');
+        if (r.count > 0) { badge.text(r.count).show(); } else { badge.hide(); }
+      });
+    }
+    function loadNotifList() {
+      $.get('/notifications/poll', function(r) {
+        const list = $('#notifList');
+        if (r.count === 0) {
+          list.html('<div class="dropdown-item text-muted small text-center py-3">Tidak ada notifikasi</div>');
+          return;
+        }
+        let html = '';
+        r.data.forEach(function(n) {
+          const time = new Date(n.created_at).toLocaleString('id-ID');
+          html += '<a class="dropdown-item notif-item" href="' + (n.link || '#') + '" data-id="' + n.id + '">';
+          html += '<div class="d-flex align-items-start gap-2">';
+          html += '<div class="notif-dot mt-1"></div>';
+          html += '<div class="flex-grow-1"><div class="fw-bold small">' + n.title + '</div>';
+          html += '<div class="text-muted" style="font-size:0.75rem;">' + n.message + '</div>';
+          html += '<div class="text-muted" style="font-size:0.65rem;">' + time + '</div></div></div></a>';
+        });
+        list.html(html);
+        $('.notif-item').on('click', function(e) {
+          const id = $(this).data('id');
+          $.post('/notifications/read/' + id);
+        });
+      });
+    }
+    $('#notifBell').on('click', function() { loadNotifList(); });
+    $('#markAllRead').on('click', function() {
+      $.post('/notifications/read/all', function() {
+        $('#notifCount').hide();
+        $('#notifList').html('<div class="dropdown-item text-muted small text-center py-3">Tidak ada notifikasi</div>');
+      });
+    });
+    setInterval(pollNotif, 15000);
+    pollNotif();
+
+    // Set active sidebar link
+    document.querySelectorAll('.sidebar .nav-link').forEach(function(link) {
+      if (link.href === window.location.href || window.location.href.startsWith(link.href + '/') || (link.href + '/' === window.location.href)) {
+        link.classList.add('active');
+      }
+    });
+    // Fix for exact match without trailing slash
+    document.querySelectorAll('.sidebar .nav-link').forEach(function(link) {
+      if (link.href.replace(/\/$/, '') === window.location.href.replace(/\/$/, '')) {
+        link.classList.add('active');
+      }
+    });
+
+    // Auto-filter: submit form on input change with debounce
+    document.querySelectorAll('form.auto-filter').forEach(function(form) {
+      var debounceTimer;
+      form.querySelectorAll('input, select, textarea').forEach(function(input) {
+        input.addEventListener('change', function() { form.submit(); });
+        if (input.tagName === 'INPUT' && input.type !== 'hidden') {
+          input.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function() { form.submit(); }, 600);
+          });
+        }
+      });
+    });
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function() {});
+    }
+  </script>
+</body>
+</html>

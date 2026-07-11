@@ -1,0 +1,399 @@
+<div class="row g-3 mb-4">
+  <div class="col-md-3 col-6">
+    <div class="card card-3d-stat border-0 rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+      <div class="card-body text-white p-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <p class="mb-0 opacity-75 small fw-semibold">Total Tiket</p>
+            <h2 class="mb-0 fw-bold counter"><%= allCount %></h2>
+          </div>
+          <div class="stat-icon-3d"><i class="bi bi-ticket-perforated fs-3"></i></div>
+        </div>
+        <div class="progress mt-2" style="height:3px;background:rgba(255,255,255,0.2);"><div class="progress-bar bg-white" style="width:100%;"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="card card-3d-stat border-0 rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+      <div class="card-body text-white p-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <p class="mb-0 opacity-75 small fw-semibold">Terbuka</p>
+            <h2 class="mb-0 fw-bold counter"><%= ticketOpen %></h2>
+          </div>
+          <div class="stat-icon-3d"><i class="bi bi-hourglass-split fs-3"></i></div>
+        </div>
+        <div class="progress mt-2" style="height:3px;background:rgba(255,255,255,0.2);"><div class="progress-bar bg-white" style="width:<%= allCount ? (ticketOpen/allCount*100) : 0 %>%"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="card card-3d-stat border-0 rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+      <div class="card-body text-white p-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <p class="mb-0 opacity-75 small fw-semibold">Diproses</p>
+            <h2 class="mb-0 fw-bold counter"><%= ticketProgress %></h2>
+          </div>
+          <div class="stat-icon-3d"><i class="bi bi-gear fs-3"></i></div>
+        </div>
+        <div class="progress mt-2" style="height:3px;background:rgba(255,255,255,0.2);"><div class="progress-bar bg-white" style="width:<%= allCount ? (ticketProgress/allCount*100) : 0 %>%"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="card card-3d-stat border-0 rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+      <div class="card-body text-white p-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <p class="mb-0 opacity-75 small fw-semibold">Selesai</p>
+            <h2 class="mb-0 fw-bold counter"><%= ticketResolved %></h2>
+          </div>
+          <div class="stat-icon-3d"><i class="bi bi-check-circle fs-3"></i></div>
+        </div>
+        <div class="progress mt-2" style="height:3px;background:rgba(255,255,255,0.2);"><div class="progress-bar bg-white" style="width:<%= allCount ? (ticketResolved/allCount*100) : 0 %>%"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KPI Cards -->
+<h5 class="mb-3 fw-bold"><i class="bi bi-speedometer2 text-primary me-2"></i> Indikator Kinerja (KPI)</h5>
+<div class="row g-3 mb-4">
+  <div class="col-md-4 col-6">
+    <div class="card card-3d-stat border-0 rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);">
+      <div class="card-body text-white p-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <p class="mb-0 opacity-75 small fw-semibold">Rata-rata Response Time</p>
+            <h3 class="mb-0 fw-bold"><%= avgResponseStr %></h3>
+          </div>
+          <div class="stat-icon-3d"><i class="bi bi-clock-history fs-3"></i></div>
+        </div>
+        <small class="opacity-75">Dibuat hingga diambil teknisi</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-6">
+    <div class="card card-3d-stat border-0 rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);">
+      <div class="card-body text-white p-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <p class="mb-0 opacity-75 small fw-semibold">Rata-rata Resolution Time</p>
+            <h3 class="mb-0 fw-bold"><%= avgResolutionStr %></h3>
+          </div>
+          <div class="stat-icon-3d"><i class="bi bi-check2-circle fs-3"></i></div>
+        </div>
+        <small class="opacity-75">Dibuat hingga selesai</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-6">
+    <div class="card card-3d-stat border-0 rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);">
+      <div class="card-body text-white p-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <p class="mb-0 opacity-75 small fw-semibold">Tiket Aktif</p>
+            <h3 class="mb-0 fw-bold"><%= ticketOpen + ticketProgress %> <small class="fs-6">item</small></h3>
+          </div>
+          <div class="stat-icon-3d"><i class="bi bi-fire fs-3"></i></div>
+        </div>
+        <small class="opacity-75">Belum selesai diproses</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tiket Terbaru -->
+<div class="card card-3d-chart border-0 rounded-4 mb-4">
+  <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-3">
+    <h6 class="mb-0 fw-bold"><i class="bi bi-ticket me-2 text-secondary"></i> Tiket Laporan Terbaru</h6>
+    <a href="/tickets" class="btn btn-sm btn-outline-primary rounded-pill px-3">Lihat Semua <i class="bi bi-arrow-right ms-1"></i></a>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>No. Tiket</th>
+            <th>Unit</th>
+            <th>Perangkat</th>
+            <th>Kategori</th>
+            <th>Prioritas</th>
+            <th>Status</th>
+            <th>Pelapor</th>
+            <th>Teknisi</th>
+            <th>Tanggal</th>
+            <th class="text-center">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (ticketBaru.length === 0) { %>
+            <tr><td colspan="10" class="text-center text-muted py-4">Belum ada tiket</td></tr>
+          <% } %>
+          <% ticketBaru.forEach(function(t) { %>
+          <tr class="align-middle">
+            <td><span class="badge bg-secondary"><%= t.no_tiket %></span></td>
+            <td><%= t.unit ? t.unit.nama_unit : '-' %></td>
+            <td><%= t.subjek %></td>
+            <td><%= t.kategori || (t.kategoriDevice ? t.kategoriDevice.nama_kategori : '-') %></td>
+            <td>
+              <% var pc = {rendah:'bg-success', sedang:'bg-warning', tinggi:'bg-danger', kritis:'bg-dark'} %>
+              <span class="badge rounded-pill <%= pc[t.prioritas] || 'bg-secondary' %>"><%= t.prioritas %></span>
+            </td>
+            <td>
+              <% var sc = {open:'bg-primary', in_progress:'bg-info', resolved:'bg-success', closed:'bg-secondary', reopened:'bg-warning'} %>
+              <% var sl = {open:'Terbuka', in_progress:'Diproses', resolved:'Selesai', closed:'Ditutup', reopened:'Dibuka Ulang'} %>
+              <span class="badge rounded-pill <%= sc[t.status] || 'bg-secondary' %>"><%= sl[t.status] || t.status %></span>
+            </td>
+            <td><small><%= t.pelapor ? t.pelapor.nama_lengkap : '-' %></small></td>
+            <td><small><%= t.teknisi ? t.teknisi.nama_lengkap : '-' %></small></td>
+            <td><small class="text-muted"><%= t.created_at ? new Date(t.created_at).toLocaleDateString('id-ID') : '-' %></small></td>
+            <td class="text-center">
+              <a href="/tickets/<%= t.id %>" class="btn btn-sm btn-outline-primary rounded-circle" style="width:32px;height:32px;"><i class="bi bi-eye"></i></a>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-8">
+    <div class="card card-3d-chart border-0 rounded-4 h-100">
+      <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-bar-chart-line me-2 text-primary"></i> Tren Bulanan</h6>
+        <span class="badge bg-light text-muted"><%= new Date().getFullYear() %></span>
+      </div>
+      <div class="card-body"><canvas id="chartMonthly"></canvas></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-3d-chart border-0 rounded-4 h-100">
+      <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-pie-chart me-2 text-warning"></i> Per Status</h6>
+      </div>
+      <div class="card-body"><canvas id="chartStatus"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-<%= user.role === 'admin' ? '6' : '12' %>">
+    <div class="card card-3d-chart border-0 rounded-4 h-100">
+      <div class="card-header bg-transparent border-0 pt-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-trophy me-2 text-warning"></i> Top 10 Unit (Tiket Terbanyak)</h6>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr><th class="text-center" style="width:40px">#</th><th>Unit</th><th class="text-end">Jumlah</th></tr>
+            </thead>
+            <tbody>
+              <% if (top10Units.length === 0) { %>
+                <tr><td colspan="3" class="text-center text-muted py-3">Belum ada data</td></tr>
+              <% } %>
+              <% top10Units.forEach(function(u, i) { %>
+              <tr>
+                <td class="text-center fw-bold"><%= i + 1 %></td>
+                <td><%= u.unit %></td>
+                <td class="text-end"><span class="badge bg-primary rounded-pill"><%= u.total %></span></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% if (user.role === 'admin') { %>
+  <div class="col-md-6">
+    <div class="card card-3d-chart border-0 rounded-4 h-100">
+      <div class="card-header bg-transparent border-0 pt-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-people me-2 text-success"></i> Performa Teknisi</h6>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr><th>Teknisi</th><th>Spesialisasi</th><th class="text-center">Aktif</th><th class="text-center">Selesai</th><th class="text-center">Rata-rata</th><th class="text-center">Status</th></tr>
+            </thead>
+            <tbody>
+              <% if (technicianPerf.length === 0) { %>
+                <tr><td colspan="6" class="text-center text-muted py-3">Belum ada teknisi</td></tr>
+              <% } %>
+              <% technicianPerf.forEach(function(t) { %>
+              <tr>
+                <td class="fw-bold"><%= t.nama %></td>
+                <td><small class="text-muted"><%= t.spesialisasi %></small></td>
+                <td class="text-center"><span class="badge bg-info rounded-pill"><%= t.active %></span></td>
+                <td class="text-center"><span class="badge bg-success rounded-pill"><%= t.completed %></span></td>
+                <td class="text-center"><small><%= t.avgHours %> jam</small></td>
+                <td class="text-center">
+                  <% if (t.available) { %>
+                    <span class="badge bg-success rounded-pill">Aktif</span>
+                  <% } else { %>
+                    <span class="badge bg-secondary rounded-pill">Off</span>
+                  <% } %>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% } %>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card card-3d-chart border-0 rounded-4 h-100">
+      <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-building me-2 text-success"></i> Per Unit</h6>
+      </div>
+      <div class="card-body"><canvas id="chartUnit"></canvas></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-3d-chart border-0 rounded-4 h-100">
+      <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-tags me-2 text-info"></i> Per Kategori</h6>
+      </div>
+      <div class="card-body"><canvas id="chartCategory"></canvas></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-3d-chart border-0 rounded-4 h-100">
+      <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-flag me-2 text-danger"></i> Per Prioritas</h6>
+      </div>
+      <div class="card-body"><canvas id="chartPriority"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<style>
+.card-3d-stat { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default; }
+.card-3d-stat:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+.card-3d-chart { transition: all 0.3s ease; }
+.card-3d-chart:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+.stat-icon-3d { animation: floatIcon 3s ease-in-out infinite; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(5deg); }
+}
+.counter { font-size: 1.8rem; line-height: 1.2; }
+.table-light { background: #f8f9ff !important; }
+</style>
+
+<script>
+var STATUS_LABELS = { open:'Terbuka', in_progress:'Diproses', resolved:'Selesai', closed:'Ditutup', reopened:'Dibuka Ulang' };
+
+document.addEventListener('DOMContentLoaded', function() {
+  const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+  // Monthly Trend
+  const monthData = [];
+  for (let i = 1; i <= 12; i++) {
+    const found = <%- JSON.stringify(monthlyTrend) %>.find(function(d) { return parseInt(d.bulan) === i; });
+    monthData.push(found ? parseInt(found.total) : 0);
+  }
+  new Chart(document.getElementById('chartMonthly'), {
+    type: 'bar',
+    data: {
+      labels: bulan,
+      datasets: [{
+        label: 'Tiket',
+        data: monthData,
+        backgroundColor: monthData.map(function(v) { return v > 0 ? 'rgba(102,126,234,0.7)' : 'rgba(200,200,200,0.2)'; }),
+        borderColor: monthData.map(function(v) { return v > 0 ? '#667eea' : 'transparent'; }),
+        borderWidth: 2, borderRadius: 6, barPercentage: 0.6
+      }]
+    },
+    options: {
+      responsive: true, animation: { duration: 1500, easing: 'easeOutQuart' },
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } }
+    }
+  });
+
+  // Status Doughnut
+  const rawStatus = <%- JSON.stringify(ticketsByStatus) %>;
+  var statusLabels = rawStatus.map(function(r) { return STATUS_LABELS[r.status] || r.status; });
+  var statusData = rawStatus.map(function(r) { return parseInt(r.total); });
+  new Chart(document.getElementById('chartStatus'), {
+    type: 'doughnut',
+    data: {
+      labels: statusLabels,
+      datasets: [{ data: statusData, backgroundColor: ['#0d6efd','#0dcaf0','#198754','#6c757d','#ffc107'], borderWidth: 3, borderColor: '#fff' }]
+    },
+    options: {
+      responsive: true, animation: { animateRotate: true, duration: 2000, easing: 'easeOutQuart' },
+      plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, font: { size: 11 } } } },
+      cutout: '65%'
+    }
+  });
+
+  // Unit Horizontal Bar
+  var unitLabels = <%- JSON.stringify(ticketsByUnit.map(r => r.unit)) %>;
+  var unitData = <%- JSON.stringify(ticketsByUnit.map(r => parseInt(r.total))) %>;
+  new Chart(document.getElementById('chartUnit'), {
+    type: 'bar',
+    data: {
+      labels: unitLabels,
+      datasets: [{
+        label: 'Tiket', data: unitData,
+        backgroundColor: ['rgba(102,126,234,0.7)','rgba(240,147,251,0.7)','rgba(79,172,254,0.7)','rgba(67,233,123,0.7)','rgba(250,112,154,0.7)','rgba(161,140,209,0.7)','rgba(0,242,254,0.7)','rgba(56,249,215,0.7)','rgba(254,225,64,0.7)','rgba(245,87,108,0.7)'],
+        borderColor: ['#667eea','#f093fb','#4facfe','#43e97b','#fa709a','#a18cd1','#00f2fe','#38f9d7','#fee140','#f5576c'],
+        borderWidth: 2, borderRadius: 4, barPercentage: 0.5
+      }]
+    },
+    options: {
+      responsive: true, indexAxis: 'y', animation: { duration: 1500, easing: 'easeOutQuart' },
+      plugins: { legend: { display: false } },
+      scales: { x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { stepSize: 1 } }, y: { grid: { display: false } } }
+    }
+  });
+
+  // Category Doughnut
+  var catLabels = <%- JSON.stringify(byCategory.map(r => r.kategori)) %>;
+  var catData = <%- JSON.stringify(byCategory.map(r => parseInt(r.total))) %>;
+  new Chart(document.getElementById('chartCategory'), {
+    type: 'doughnut',
+    data: {
+      labels: catLabels,
+      datasets: [{ data: catData, backgroundColor: ['#667eea','#4facfe','#43e97b','#fa709a','#a18cd1','#f093fb'], borderWidth: 3, borderColor: '#fff' }]
+    },
+    options: {
+      responsive: true, animation: { animateRotate: true, duration: 2000, easing: 'easeOutQuart' },
+      plugins: { legend: { position: 'bottom', labels: { padding: 10, usePointStyle: true, font: { size: 10 } } } },
+      cutout: '60%'
+    }
+  });
+
+  // Priority Polar Area
+  var prioLabels = <%- JSON.stringify(byPriority.map(r => r.prioritas)) %>;
+  var prioData = <%- JSON.stringify(byPriority.map(r => parseInt(r.total))) %>;
+  new Chart(document.getElementById('chartPriority'), {
+    type: 'polarArea',
+    data: {
+      labels: prioLabels,
+      datasets: [{
+        data: prioData,
+        backgroundColor: ['rgba(25,135,84,0.6)','rgba(255,193,7,0.6)','rgba(220,53,69,0.6)','rgba(33,37,41,0.6)'],
+        borderColor: ['#198754','#ffc107','#dc3545','#212529'], borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true, animation: { duration: 2000, easing: 'easeOutQuart' },
+      plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, font: { size: 11 } } } },
+      scales: { r: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { display: false } } }
+    }
+  });
+});
+</script>

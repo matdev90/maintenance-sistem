@@ -1,0 +1,112 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div></div>
+  <a href="/tickets/create" class="btn btn-primary btn-3d"><i class="bi bi-plus-lg"></i> Buat Tiket Baru</a>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="GET" class="auto-filter row g-2 align-items-end">
+      <div class="col-md-2">
+        <label class="form-label small">Status</label>
+        <select name="status" class="form-select form-select-sm">
+          <option value="">Semua Status</option>
+          <option value="open" <%= filters.status === 'open' ? 'selected' : '' %>>Terbuka</option>
+          <option value="in_progress" <%= filters.status === 'in_progress' ? 'selected' : '' %>>Dalam Pengerjaan</option>
+          <option value="resolved" <%= filters.status === 'resolved' ? 'selected' : '' %>>Terselesaikan</option>
+          <option value="closed" <%= filters.status === 'closed' ? 'selected' : '' %>>Ditutup</option>
+          <option value="reopened" <%= filters.status === 'reopened' ? 'selected' : '' %>>Dibuka Ulang</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Prioritas</label>
+        <select name="prioritas" class="form-select form-select-sm">
+          <option value="">Semua Prioritas</option>
+          <option value="rendah" <%= filters.prioritas === 'rendah' ? 'selected' : '' %>>Rendah</option>
+          <option value="sedang" <%= filters.prioritas === 'sedang' ? 'selected' : '' %>>Sedang</option>
+          <option value="tinggi" <%= filters.prioritas === 'tinggi' ? 'selected' : '' %>>Tinggi</option>
+          <option value="kritis" <%= filters.prioritas === 'kritis' ? 'selected' : '' %>>Kritis</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Kategori</label>
+        <select name="kategori" class="form-select form-select-sm">
+          <option value="">Semua Kategori</option>
+          <option value="hardware" <%= filters.kategori === 'hardware' ? 'selected' : '' %>>Hardware</option>
+          <option value="software" <%= filters.kategori === 'software' ? 'selected' : '' %>>Software</option>
+          <option value="jaringan" <%= filters.kategori === 'jaringan' ? 'selected' : '' %>>Jaringan</option>
+          <option value="akun" <%= filters.kategori === 'akun' ? 'selected' : '' %>>Akun</option>
+          <option value="lainnya" <%= filters.kategori === 'lainnya' ? 'selected' : '' %>>Lainnya</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">Cari</label>
+        <input type="text" name="q" class="form-control form-control-sm" placeholder="No. tiket, subjek..." value="<%= filters.q || '' %>">
+      </div>
+      <div class="col-md-1">
+        <button type="submit" class="btn btn-sm btn-primary w-100 btn-3d"><i class="bi bi-search"></i></button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>No. Tiket</th>
+            <th>Subjek</th>
+            <th>Kategori</th>
+            <th>Prioritas</th>
+            <th>Status</th>
+            <th>Pelapor</th>
+            <th>Teknisi</th>
+            <th>Tanggal</th>
+            <th style="width:60px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (tickets.length === 0) { %>
+          <tr><td colspan="9" class="text-center text-muted py-4">Belum ada tiket</td></tr>
+          <% } else { tickets.forEach(function(t) { %>
+          <tr>
+            <td><span class="badge bg-secondary"><%= t.no_tiket %></span></td>
+            <td><%= t.subjek %></td>
+            <td><%= t.kategori %></td>
+            <td>
+              <% var pClass = {rendah:'bg-success', sedang:'bg-warning', tinggi:'bg-danger', kritis:'bg-dark'}[t.prioritas] || 'bg-secondary'; %>
+              <span class="badge <%= pClass %>"><%= t.prioritas %></span>
+            </td>
+            <td>
+              <% var sClass = {open:'bg-primary', in_progress:'bg-info', resolved:'bg-success', closed:'bg-secondary', reopened:'bg-warning'}[t.status] || 'bg-secondary'; %>
+              <% var sLabel = {open:'Terbuka', in_progress:'Dalam Pengerjaan', resolved:'Terselesaikan', closed:'Ditutup', reopened:'Dibuka Ulang'}[t.status] || t.status; %>
+              <span class="badge <%= sClass %>"><%= sLabel %></span>
+            </td>
+            <td><%= t.pelapor ? t.pelapor.nama_lengkap : '-' %></td>
+            <td><% if (t.teknisi) { %><%= t.teknisi.nama_lengkap %><% } else { %><span class="text-muted">-</span><% } %></td>
+            <td class="small text-muted"><%= t.created_at %></td>
+            <td><a href="/tickets/<%= t.id %>" class="btn btn-sm btn-outline-primary btn-3d"><i class="bi bi-eye"></i></a></td>
+          </tr>
+          <% }); } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/pagination', { pagination, filters, baseUrl: '/tickets' }) %>
+
+<script>
+(function() {
+  function init() {
+    if (typeof io === 'undefined') { setTimeout(init, 500); return; }
+    if (typeof socket === 'undefined') window.socket = io();
+    if (window.socket) {
+      window.socket.on('new_report_layanan', function() { location.reload(); });
+      window.socket.on('report_update_layanan', function() { location.reload(); });
+    }
+  }
+  setTimeout(init, 1000);
+})();
+</script>

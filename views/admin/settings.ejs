@@ -1,0 +1,232 @@
+<div class="row">
+  <div class="col-md-6 mb-3">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-hospital"></i> Profil Rumah Sakit</h6></div>
+      <div class="card-body">
+        <form method="POST" action="/admin/settings" enctype="multipart/form-data" onsubmit="Modal3D.showLoading('Menyimpan pengaturan...')">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label">Nama Rumah Sakit <span class="text-danger">*</span></label>
+            <input type="text" name="nama_rs" class="form-control" value="<%= settings.nama_rs || '' %>" maxlength="100" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Alamat</label>
+            <textarea name="alamat_rs" class="form-control" rows="2" maxlength="255"><%= settings.alamat_rs || '' %></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Telepon</label>
+            <input type="text" name="telepon_rs" class="form-control" value="<%= settings.telepon_rs || '' %>" maxlength="20" placeholder="Contoh: (021) 12345678">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Logo</label>
+            <input type="file" name="logo_rs" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp">
+            <div class="form-text">Format: JPG, PNG, GIF, WebP. Maks 2MB.</div>
+            <% if (settings.logo_rs) { %>
+              <div class="mt-2">
+                <img src="/uploads/<%= settings.logo_rs %>" style="max-height:60px" class="border rounded p-1">
+                <small class="text-muted ms-2">Logo saat ini</small>
+              </div>
+            <% } %>
+          </div>
+          <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-save"></i> Simpan</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 mb-3">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-telegram"></i> Notifikasi Telegram</h6></div>
+      <div class="card-body">
+        <form method="POST" action="/admin/settings/telegram" onsubmit="Modal3D.showLoading('Menyimpan pengaturan Telegram...')">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label">Bot Token <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <input type="password" id="tgToken" name="telegram_bot_token" class="form-control font-monospace" value="<%= settings.telegram_bot_token || '' %>" placeholder="1234567890:ABCdefGHIjklMNOpqrSTUvwxYZ" required>
+              <button class="btn btn-outline-secondary" type="button" onclick="toggleTgToken()"><i class="bi bi-eye" id="tgTokenIcon"></i></button>
+            </div>
+            <div class="form-text">Dapatkan dari <a href="https://t.me/BotFather" target="_blank">@BotFather</a> di Telegram</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Chat ID <span class="text-danger">*</span></label>
+            <input type="text" name="telegram_chat_id" class="form-control font-monospace" value="<%= settings.telegram_chat_id || '' %>" placeholder="-1001234567890" pattern="-?\d+" title="Harus berupa angka" required>
+            <div class="form-text">Chat ID grup/penerima notifikasi (hanya angka)</div>
+          </div>
+          <div class="mb-3 form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="telegram_enabled" name="telegram_enabled" value="true"
+              <%= settings.telegram_enabled === 'true' ? 'checked' : '' %>>
+            <label class="form-check-label" for="telegram_enabled">Aktifkan Notifikasi Telegram (Outbound)</label>
+          </div>
+          <div class="mb-3 form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="telegram_inbound" name="telegram_bot_inbound" value="true"
+              <%= settings.telegram_bot_inbound === 'true' ? 'checked' : '' %>>
+            <label class="form-check-label" for="telegram_inbound">Aktifkan Telegram Bot Inbound (Lapor via Chat)</label>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Webhook URL (untuk Bot Inbound)</label>
+            <input type="url" name="telegram_webhook_url" class="form-control" value="<%= settings.telegram_webhook_url || '' %>" placeholder="https://domain-anda.com">
+            <div class="form-text">Kosongkan jika menggunakan polling. Contoh: https://anda.com (tanpa trailing slash)</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-save"></i> Simpan</button>
+            <button type="button" class="btn btn-outline-secondary btn-3d" id="btnTestTg" onclick="testTelegram()">
+              <i class="bi bi-send"></i> Kirim Test
+            </button>
+          </div>
+          <div id="tgResult" class="mt-2" style="display:none"></div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-stopwatch"></i> Target SLA</h6></div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr>
+              <th>Prioritas</th>
+              <th>Validasi (jam)</th>
+              <th>Investigasi (jam)</th>
+              <th>Selesai (jam)</th>
+              <th style="width:50px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% slaTargets.forEach(function(s) { %>
+            <form method="POST" action="/admin/settings/sla" onsubmit="Modal3D.showLoading('Menyimpan SLA...')">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <input type="hidden" name="id" value="<%= s.id %>">
+              <tr>
+                <td><span class="badge <%= {ringan:'bg-success', sedang:'bg-warning', berat:'bg-danger', kritis:'bg-dark'}[s.prioritas] %>"><%= s.prioritas %></span></td>
+                <td><input type="number" name="batas_validasi_jam" class="form-control form-control-sm" value="<%= s.batas_validasi_jam %>" min="1" required></td>
+                <td><input type="number" name="batas_investigasi_jam" class="form-control form-control-sm" value="<%= s.batas_investigasi_jam %>" min="1" required></td>
+                <td><input type="number" name="batas_selesai_jam" class="form-control form-control-sm" value="<%= s.batas_selesai_jam %>" min="1" required></td>
+                <td><button type="submit" class="btn btn-sm btn-primary btn-3d"><i class="bi bi-check"></i></button></td>
+              </tr>
+            </form>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-3">
+  <div class="col-md-6 mb-3">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-whatsapp"></i> WhatsApp Business API</h6></div>
+      <div class="card-body">
+        <form method="POST" action="/admin/settings/whatsapp">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3 form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="whatsapp_enabled" name="whatsapp_enabled" value="true"
+              <%= settings.whatsapp_enabled === 'true' ? 'checked' : '' %>>
+            <label class="form-check-label" for="whatsapp_enabled">Aktifkan Integrasi WhatsApp</label>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">API URL</label>
+            <input type="url" name="whatsapp_api_url" class="form-control" value="<%= settings.whatsapp_api_url || '' %>" placeholder="https://graph.facebook.com/v17.0">
+            <div class="form-text">WhatsApp Business API endpoint (Meta Cloud API atau provider lain)</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">API Key / Access Token</label>
+            <input type="password" name="whatsapp_api_key" class="form-control font-monospace" value="<%= settings.whatsapp_api_key || '' %>" placeholder="EAAG...">
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Phone Number ID</label>
+              <input type="text" name="whatsapp_phone_number_id" class="form-control" value="<%= settings.whatsapp_phone_number_id || '' %>" placeholder="1234567890">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Verify Token</label>
+              <input type="text" name="whatsapp_verify_token" class="form-control" value="<%= settings.whatsapp_verify_token || '' %>" placeholder="token_verify_anda">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-save"></i> Simpan</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 mb-3">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-info-circle"></i> Informasi Integrasi</h6></div>
+      <div class="card-body small">
+        <h6>Telegram Bot Inbound</h6>
+        <p>Fitur ini memungkinkan staf melapor langsung via chat Telegram tanpa membuka web. Pengguna perlu mengirim pesan ke bot dan mengikuti panduan interaktif.</p>
+        <p><strong>Cara setup:</strong></p>
+        <ol>
+          <li>Buat bot di @BotFather dan masukkan token di atas</li>
+          <li>Aktifkan "Telegram Bot Inbound"</li>
+          <li>Untuk polling: biarkan Webhook URL kosong</li>
+          <li>Untuk webhook: masukkan URL server Anda</li>
+          <li>Daftarkan pengguna dengan format username: <code>tg_[chat_id]</code></li>
+        </ol>
+        <hr>
+        <h6>WhatsApp Business API</h6>
+        <p>Integrasi ini mengirim notifikasi WhatsApp ke teknisi saat ada tiket/laporan baru. Memerlukan akun WhatsApp Business API (Meta Cloud API atau provider seperti Fonnte/Wablas).</p>
+        <hr>
+        <h6>Auto-Assignment</h6>
+        <p>Sistem akan otomatis menugaskan laporan/tiket ke teknisi berdasarkan spesialisasi dan jumlah beban kerja. Atur profil teknisi di menu <a href="/admin/technicians">Teknisi</a>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2FA Section -->
+<div class="row mt-3">
+  <div class="col-md-12 mb-3">
+    <div class="card border-warning">
+      <div class="card-header bg-warning bg-opacity-10">
+        <h6 class="mb-0"><i class="bi bi-shield-lock me-2"></i> Keamanan: Two-Factor Authentication (2FA)</h6>
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-3">Aktifkan 2FA untuk keamanan tambahan. Setelah diaktifkan, Anda akan dimasukkan kode OTP saat login.</p>
+        <a href="/admin/2fa" class="btn btn-warning btn-3d">
+          <i class="bi bi-gear"></i> Atur 2FA
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleTgToken() {
+  var inp = document.getElementById('tgToken');
+  var icon = document.getElementById('tgTokenIcon');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.className = 'bi bi-eye-slash';
+  } else {
+    inp.type = 'password';
+    icon.className = 'bi bi-eye';
+  }
+}
+
+function testTelegram() {
+  var btn = document.getElementById('btnTestTg');
+  var result = document.getElementById('tgResult');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Mengirim...';
+  result.style.display = 'block';
+  result.className = 'alert alert-info';
+  result.textContent = 'Mengirim pesan test...';
+
+  fetch('/admin/settings/telegram/test', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      result.className = data.ok ? 'alert alert-success' : 'alert alert-danger';
+      result.textContent = data.message;
+    })
+    .catch(function() {
+      result.className = 'alert alert-danger';
+      result.textContent = 'Gagal mengirim pesan test';
+    })
+    .finally(function() {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-send"></i> Kirim Test';
+    });
+}
+</script>

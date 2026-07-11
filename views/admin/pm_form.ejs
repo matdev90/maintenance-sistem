@@ -1,0 +1,94 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-tools"></i> <%= pm ? 'Edit' : 'Tambah' %> Jadwal PM</h6></div>
+      <div class="card-body">
+        <form method="POST" action="<%= pm ? '/admin/pm/' + pm.id + '/update' : '/admin/pm/store' %>" onsubmit="Modal3D.showLoading()">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <div class="mb-3">
+            <label class="form-label">Nama Perangkat *</label>
+            <input type="text" name="nama_perangkat" class="form-control" value="<%= pm ? pm.nama_perangkat : '' %>" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Deskripsi</label>
+            <textarea name="deskripsi" class="form-control" rows="2"><%= pm ? (pm.deskripsi || '') : '' %></textarea>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Frekuensi</label>
+              <select name="frekuensi" class="form-select">
+                <% var freqOpts = ['harian','mingguan','bulanan','kuartalan','tahunan']; %>
+                <% freqOpts.forEach(function(f) { %>
+                <option value="<%= f %>" <%= (pm && pm.frekuensi === f) ? 'selected' : '' %>><%= f.charAt(0).toUpperCase() + f.slice(1) %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Hari Interval</label>
+              <input type="number" name="hari_interval" class="form-control" value="<%= pm ? pm.hari_interval : 30 %>" min="1">
+              <small class="text-muted">Hari antar maintenance</small>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Status</label>
+              <select name="status" class="form-select">
+                <option value="aktif" <%= (pm && pm.status === 'aktif') ? 'selected' : (!pm ? 'selected' : '') %>>Aktif</option>
+                <option value="nonaktif" <%= (pm && pm.status === 'nonaktif') ? 'selected' : '' %>>Nonaktif</option>
+                <option value="selesai" <%= (pm && pm.status === 'selesai') ? 'selected' : '' %>>Selesai</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Terakhir Dilakukan</label>
+              <input type="date" name="terakhir_dilakukan" class="form-control" value="<%= pm ? (pm.terakhir_dilakukan || '') : '' %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Teknisi Default</label>
+              <select name="id_teknisi_default" class="form-select">
+                <option value="">Pilih Teknisi</option>
+                <% users.forEach(function(u) { %>
+                <option value="<%= u.id %>" <%= (pm && pm.id_teknisi_default == u.id) ? 'selected' : '' %>><%= u.nama_lengkap %></option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Kategori</label>
+              <select name="id_kategori" class="form-select">
+                <option value="">Pilih Kategori</option>
+                <% categories.forEach(function(c) { %>
+                <option value="<%= c.id %>" <%= (pm && pm.id_kategori == c.id) ? 'selected' : '' %>><%= c.nama_kategori %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Aset</label>
+              <select name="id_asset" class="form-select">
+                <option value="">Pilih Aset</option>
+                <% assets.forEach(function(a) { %>
+                <option value="<%= a.id %>" <%= (pm && pm.id_asset == a.id) ? 'selected' : '' %>><%= a.nama_perangkat %></option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Catatan</label>
+            <textarea name="catatan" class="form-control" rows="2"><%= pm ? (pm.catatan || '') : '' %></textarea>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-check-lg"></i> Simpan</button>
+            <a href="/admin/pm" class="btn btn-secondary btn-3d"><i class="bi bi-arrow-left"></i> Kembali</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,110 @@
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form id="filterForm" class="auto-filter row g-2 align-items-end">
+      <div class="col-md-2">
+        <label class="form-label small">Unit</label>
+        <select name="unit" class="form-select form-select-sm filter-input">
+          <option value="">Semua Unit</option>
+          <% units.forEach(function(u) { %>
+          <option value="<%= u.id %>" <%= filters.unit == u.id ? 'selected' : '' %>><%= u.nama_unit %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Prioritas</label>
+        <select name="prioritas" class="form-select form-select-sm filter-input">
+          <option value="">Semua</option>
+          <option value="rendah" <%= filters.prioritas === 'rendah' ? 'selected' : '' %>>Rendah</option>
+          <option value="ringan" <%= filters.prioritas === 'ringan' ? 'selected' : '' %>>Ringan</option>
+          <option value="sedang" <%= filters.prioritas === 'sedang' ? 'selected' : '' %>>Sedang</option>
+          <option value="tinggi" <%= filters.prioritas === 'tinggi' ? 'selected' : '' %>>Tinggi</option>
+          <option value="berat" <%= filters.prioritas === 'berat' ? 'selected' : '' %>>Berat</option>
+          <option value="kritis" <%= filters.prioritas === 'kritis' ? 'selected' : '' %>>Kritis</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Status</label>
+        <select name="status" class="form-select form-select-sm filter-input">
+          <option value="">Semua</option>
+          <option value="open" <%= filters.status === 'open' ? 'selected' : '' %>>Terbuka</option>
+          <option value="in_progress" <%= filters.status === 'in_progress' ? 'selected' : '' %>>Dalam Pengerjaan</option>
+          <option value="resolved" <%= filters.status === 'resolved' ? 'selected' : '' %>>Terselesaikan</option>
+          <option value="closed" <%= filters.status === 'closed' ? 'selected' : '' %>>Ditutup</option>
+          <option value="reopened" <%= filters.status === 'reopened' ? 'selected' : '' %>>Dibuka Ulang</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Dari</label>
+        <input type="date" name="dari" class="form-control form-control-sm filter-input" value="<%= filters.dari || '' %>">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Sampai</label>
+        <input type="date" name="sampai" class="form-control form-control-sm filter-input" value="<%= filters.sampai || '' %>">
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h6 class="mb-0"><i class="bi bi-table"></i> Data Laporan Mutu</h6>
+    <div>
+      <a href="/export/export-pdf?<%= querystring.stringify(filters) %>" class="btn btn-sm btn-danger" target="_blank">
+        <i class="bi bi-file-pdf"></i> PDF
+      </a>
+      <a href="/export/export-excel?<%= querystring.stringify(filters) %>" class="btn btn-sm btn-success">
+        <i class="bi bi-file-excel"></i> Excel
+      </a>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-hover mb-0">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Tipe</th>
+            <th>No. Tiket/Lap</th>
+            <th>Unit</th>
+            <th>Perangkat</th>
+            <th>Prioritas</th>
+            <th>Status</th>
+            <th>Pelapor</th>
+            <th>Teknisi</th>
+            <th>Tgl Lapor</th>
+            <th>Tgl Diambil</th>
+            <th>Response (jam)</th>
+            <th>Tgl Selesai</th>
+            <th>Total (jam)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (data.length === 0) { %>
+          <tr><td colspan="14" class="text-center text-muted py-4">Tidak ada data</td></tr>
+          <% } %>
+          <% data.forEach(function(d, i) { %>
+          <tr>
+            <td><%= i + 1 %></td>
+            <td><span class="badge <%= d.tipe === 'Tiket' ? 'bg-primary' : 'bg-secondary' %>"><%= d.tipe %></span></td>
+            <td><%= d.no %></td>
+            <td><%= d.unit %></td>
+            <td><%= d.perangkat %></td>
+            <td><span class="badge <%= {ringan:'bg-success', sedang:'bg-warning', berat:'bg-danger', kritis:'bg-dark', rendah:'bg-success', tinggi:'bg-danger'}[d.prioritas] || 'bg-warning' %>"><%= d.prioritas %></span></td>
+            <td><span class="badge bg-secondary"><%= {open:'Terbuka', in_progress:'Dalam Pengerjaan', resolved:'Terselesaikan', closed:'Ditutup', reopened:'Dibuka Ulang'}[d.status] || d.status.replace(/_/g,' ') %></span></td>
+            <td><%= d.pelapor %></td>
+            <td><%= d.teknisi || '-' %></td>
+            <td><%= d.tgl_lapor ? new Date(d.tgl_lapor).toLocaleString('id-ID') : '-' %></td>
+            <td><%= d.tgl_ambil ? new Date(d.tgl_ambil).toLocaleString('id-ID') : '-' %></td>
+            <td><strong><%= d.responseTime || '-' %></strong></td>
+            <td><%= d.tgl_selesai ? new Date(d.tgl_selesai).toLocaleString('id-ID') : '-' %></td>
+            <td><strong><%= d.totalTime || '-' %></strong></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <%- include('../partials/pagination', { pagination, filters: filters }) %>
+  </div>
+</div>
+
+
