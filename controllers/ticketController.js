@@ -1,11 +1,11 @@
 const { Op } = require('sequelize');
 const { Ticket, TicketHistory, Unit, User, Rating, TechnicianProfile, Report, Layanan, DeviceCategory } = require('../models');
 const { autoAssignTicket } = require('../utils/autoAssign');
-const { broadcastNotification, emitToAll } = require('../utils/socket');
+const { broadcastNotification } = require('../utils/socket');
 const { notifyTicketWhatsApp } = require('../utils/whatsapp');
 const { formatStatusTicket, generateTicketNumber, notifyAllTeknisi, notifyAllAdmins, emitDisplayUpdate } = require('../utils/helpers');
+const { checkMaxTasks } = require('../utils/activeTask');
 const { logTicket } = require('../utils/logger');
-const { sendTelegramNotification } = require('../utils/telegram');
 const { notifyTeknisiTelegram } = require('../utils/telegramBot');
 
 exports.index = async (req, res) => {
@@ -107,22 +107,7 @@ exports.store = async (req, res) => {
     req.flash('success', 'Tiket ' + no_tiket + ' berhasil dibuat. Teknisi akan menangani.');
     res.redirect('/tickets');
 
-    // Emit to display monitor
-    if (id_kategori) {
-      try {
-        const kategori = await DeviceCategory.findByPk(id_kategori);
-        if (kategori) {
-          const layanan = await Layanan.findByPk(kategori.id_layanan);
-          if (layanan) {
-            const unit = id_unit ? await Unit.findByPk(id_unit) : null;
-            emitToAll('new_report_layanan', {
-              kode_layanan: layanan.kode,
-              report: { id: ticket.id, no: no_tiket, unit: unit ? unit.nama_unit : '-', kategori: kategori.nama_kategori, prioritas: ticket.prioritas }
-            });
-          }
-        }
-      } catch (e) { console.error('Display emit error:', e.message); }
-    }
+    emitDisplayUpdate(ticket.id, Ticket, 'kategoriDevice');
 
     // Notify teknisi via Telegram (inline keyboard)
     try {
@@ -189,24 +174,10 @@ exports.ambilTugas = async (req, res) => {
     return res.redirect('/tickets/' + id);
   }
 
-  const techProfile = await TechnicianProfile.findOne({ where: { id_user: req.user.id } });
-  if (techProfile && !techProfile.is_available) {
-    req.flash('error', 'Anda sedang tidak tersedia. Ubah status availability terlebih dahulu.');
+  const taskCheck = await checkMaxTasks(req.user.id);
+  if (!taskCheck.allowed) {
+    req.flash('error', taskCheck.message);
     return res.redirect('/tickets/' + id);
-  }
-
-  if (techProfile && techProfile.max_tugas_aktif) {
-    const activeReports = await Report.count({
-      where: { id_teknisi: req.user.id, status: { [Op.in]: ['divalidasi', 'investigasi', 'dalam_perbaikan'] } }
-    });
-    const activeTickets = await Ticket.count({
-      where: { id_teknisi: req.user.id, status: { [Op.in]: ['open', 'in_progress', 'reopened'] } }
-    });
-    const totalActive = activeReports + activeTickets;
-    if (totalActive >= techProfile.max_tugas_aktif) {
-      req.flash('error', 'Batas tugas aktif tercapai (' + totalActive + '/' + techProfile.max_tugas_aktif + '). Selesaikan tugas lain terlebih dahulu.');
-      return res.redirect('/tickets/' + id);
-    }
   }
 
   ticket.status = 'in_progress';

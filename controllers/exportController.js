@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
-const { Report, Ticket, TicketHistory, Unit, User, DeviceCategory, Layanan } = require('../models');
+const { Report, Ticket, TicketHistory, Unit, User, DeviceCategory } = require('../models');
+const { durMs, formatDuration } = require('../utils/helpers');
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
 const path = require('path');
@@ -52,26 +53,6 @@ const offset = ((parseInt(page) || 1) - 1) * limit;
   const totalCount = reports.length + tickets.length;
   const units = await Unit.findAll({ order: [['nama_unit', 'ASC']] });
 
-function durMs(a, b) {
-  if (!a || !b) return null;
-  return new Date(a) - new Date(b);
-}
-
-function fmtDur(ms) {
-  if (ms === null || ms === undefined) return '-';
-  const detik = Math.floor(ms / 1000);
-  const menit = Math.floor(detik / 60);
-  const jam = Math.floor(menit / 60);
-  const s = detik % 60;
-  const m = menit % 60;
-  const h = jam;
-  let r = '';
-  if (h > 0) r += h + ' jam ';
-  if (m > 0) r += m + ' menit ';
-  r += s + ' detik';
-  return r.trim();
-}
-
   const reportData = reports.map(r => {
     const responseMs = durMs(r.tgl_validasi, r.created_at);
     const totalMs = durMs(r.tgl_selesai, r.created_at);
@@ -87,8 +68,8 @@ function fmtDur(ms) {
       tgl_lapor: r.created_at,
       tgl_ambil: r.tgl_validasi,
       tgl_selesai: r.tgl_selesai,
-      responseTime: fmtDur(responseMs),
-      totalTime: fmtDur(totalMs)
+      responseTime: formatDuration(responseMs),
+      totalTime: formatDuration(totalMs)
     };
   });
 
@@ -121,8 +102,8 @@ function fmtDur(ms) {
       tgl_lapor: t.created_at,
       tgl_ambil: tglAmbil,
       tgl_selesai: t.tgl_selesai,
-      responseTime: fmtDur(responseMs),
-      totalTime: fmtDur(totalMs)
+      responseTime: formatDuration(responseMs),
+      totalTime: formatDuration(totalMs)
     };
   });
 

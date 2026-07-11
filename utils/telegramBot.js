@@ -1,17 +1,12 @@
 const axios = require('axios');
 const { Op } = require('sequelize');
-const { User, Unit, DeviceCategory, Report, Ticket, TicketHistory, ReportTracking, Notification, TechnicianProfile, Setting, Asset, Layanan } = require('../models');
+const { User, Unit, DeviceCategory, Report, Ticket, TicketHistory, ReportTracking, Notification, TechnicianProfile, Asset, Layanan } = require('../models');
 const { autoAssignReport, autoAssignTicket } = require('./autoAssign');
-const { emitToAll } = require('./socket');
+const { getTelegramConfig } = require('./telegram');
+const { generateTicketNumber, emitDisplayUpdate } = require('./helpers');
+const { checkMaxTasks } = require('./activeTask');
 
 const userSessions = new Map();
-
-function getTelegramConfig() {
-  return {
-    enabled: process.env.TELEGRAM_BOT_INBOUND === 'true',
-    botToken: process.env.TELEGRAM_BOT_TOKEN || ''
-  };
-}
 
 async function sendTelegramMessage(chatId, text, options = {}) {
   try {
@@ -443,17 +438,7 @@ async function handleSessionStep(chatId, session, text, photo, user) {
       data.prioritas = prioritas;
 
       try {
-        const { Ticket: TicketModel } = require('../models');
-        async function genTktNum() {
-          for (let i = 0; i < 5; i++) {
-            const c = await TicketModel.count();
-            const n = 'TKT-' + String(c + 1 + i).padStart(4, '0');
-            const ex = await TicketModel.findOne({ where: { no_tiket: n }, attributes: ['id'] });
-            if (!ex) return n;
-          }
-          return 'TKT-' + Date.now().toString().slice(-8);
-        }
-        const no_tiket = await genTktNum();
+        const no_tiket = await generateTicketNumber();
 
         const ticket = await Ticket.create({
           no_tiket,
@@ -683,23 +668,9 @@ async function handleCallbackQuery(callbackQuery) {
       return;
     }
 
-    // Check max active tasks
-    if (profile && profile.max_tugas_aktif) {
-      const activeTickets = await Ticket.count({
-        where: { id_teknisi: techUser.id, status: { [Op.in]: ['open', 'in_progress', 'reopened'] } }
-      });
-      const activeReports = await Report.count({
-        where: { id_teknisi: techUser.id, status: { [Op.in]: ['divalidasi', 'investigasi', 'dalam_perbaikan'] } }
-      });
-      if ((activeTickets + activeReports) >= profile.max_tugas_aktif) {
-        await answerCallbackQuery(callbackQuery.id,
-          `Batas tugas aktif tercapai (${activeTickets + activeReports}/${profile.max_tugas_aktif})`);
-        return;
-      }
-    }
-
-    if (!profile.is_available) {
-      await answerCallbackQuery(callbackQuery.id, 'Status Anda sedang tidak tersedia');
+    const taskCheck = await checkMaxTasks(techUser.id);
+    if (!taskCheck.allowed) {
+      await answerCallbackQuery(callbackQuery.id, taskCheck.message);
       return;
     }
 
@@ -728,19 +699,7 @@ async function handleCallbackQuery(callbackQuery) {
         'Ditangani oleh ' + techUser.nama_lengkap, '/tickets/' + ticket.id);
     }
 
-    // Broadcast to display monitor
-    try {
-      const kategori = await DeviceCategory.findByPk(ticket.id_kategori);
-      if (kategori) {
-        const layanan = await Layanan.findByPk(kategori.id_layanan);
-        if (layanan) {
-          emitToAll('report_update_layanan', {
-            kode_layanan: layanan.kode,
-            report: { id: ticket.id, status: ticket.status, teknisi: techUser.nama_lengkap }
-          });
-        }
-      }
-    } catch (e) { console.error('Display emit error:', e.message); }
+    emitDisplayUpdate(ticket.id, Ticket, 'kategoriDevice');
 
     // Update the Telegram message - add taken info + Selesai button
     try {
@@ -801,19 +760,7 @@ async function handleCallbackQuery(callbackQuery) {
         'Diselesaikan oleh ' + techUser.nama_lengkap, '/tickets/' + ticket.id);
     }
 
-    // Broadcast to display monitor
-    try {
-      const kategori = await DeviceCategory.findByPk(ticket.id_kategori);
-      if (kategori) {
-        const layanan = await Layanan.findByPk(kategori.id_layanan);
-        if (layanan) {
-          emitToAll('report_update_layanan', {
-            kode_layanan: layanan.kode,
-            report: { id: ticket.id, status: ticket.status, teknisi: techUser.nama_lengkap }
-          });
-        }
-      }
-    } catch (e) { console.error('Display emit error:', e.message); }
+    emitDisplayUpdate(ticket.id, Ticket, 'kategoriDevice');
 
     // Update the Telegram message
     try {

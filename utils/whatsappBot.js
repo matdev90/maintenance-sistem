@@ -2,23 +2,9 @@ const { Op } = require('sequelize');
 const { User, Unit, DeviceCategory, Report, Ticket, TicketHistory, ReportTracking, Notification, TechnicianProfile, Setting, Asset } = require('../models');
 const { autoAssignReport, autoAssignTicket } = require('./autoAssign');
 const { sendWhatsAppMessage, getWhatsAppConfig } = require('./whatsapp');
+const { generateTicketNumber } = require('./helpers');
 
 const userSessions = new Map();
-
-function generateTicketNumberSync(counter) {
-  return 'TKT-' + String(counter).padStart(4, '0');
-}
-
-async function genTktNum() {
-  const { Ticket: TicketModel } = require('../models');
-  for (let i = 0; i < 5; i++) {
-    const c = await TicketModel.count();
-    const n = 'TKT-' + String(c + 1 + i).padStart(4, '0');
-    const ex = await TicketModel.findOne({ where: { no_tiket: n }, attributes: ['id'] });
-    if (!ex) return n;
-  }
-  return 'TKT-' + Date.now().toString().slice(-8);
-}
 
 async function processWhatsAppMessage(from, text) {
   try {
@@ -355,7 +341,7 @@ async function handleSessionStep(from, session, text, user) {
       data.prioritas = prioritas;
 
       try {
-        const no_tiket = await genTktNum();
+        const no_tiket = await generateTicketNumber();
 
         const ticket = await Ticket.create({
           no_tiket,

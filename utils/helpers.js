@@ -77,6 +77,27 @@ async function emitDisplayUpdate(entityId, model, kategoriAlias) {
   } catch (e) { console.error('Display emit error:', e.message); }
 }
 
+function durMs(a, b) {
+  if (!a || !b) return null;
+  return new Date(a) - new Date(b);
+}
+
+function formatDuration(ms) {
+  if (ms === null || ms === undefined) return '-';
+  const detik = Math.round(ms / 1000);
+  if (detik < 0) return '-';
+  const menit = Math.floor(detik / 60);
+  const jam = Math.floor(menit / 60);
+  const s = detik % 60;
+  const m = menit % 60;
+  const h = jam;
+  let r = '';
+  if (h > 0) r += h + ' jam ';
+  if (m > 0) r += m + ' menit ';
+  r += s + ' detik';
+  return r.trim();
+}
+
 module.exports = {
   formatStatusTicket,
   formatStatusReport,
@@ -85,5 +106,7 @@ module.exports = {
   notifyRole,
   notifyAllAdmins,
   notifyAllTeknisi,
-  emitDisplayUpdate
+  emitDisplayUpdate,
+  durMs,
+  formatDuration
 };
