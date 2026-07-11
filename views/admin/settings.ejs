@@ -127,12 +127,13 @@
           </div>
           <div class="mb-3">
             <label class="form-label">API URL</label>
-            <input type="url" name="whatsapp_api_url" class="form-control" value="<%= settings.whatsapp_api_url || '' %>" placeholder="https://graph.facebook.com/v17.0">
+            <input type="url" name="whatsapp_api_url" class="form-control" value="<%= settings.whatsapp_api_url || '' %>" placeholder="https://graph.facebook.com/v21.0">
             <div class="form-text">WhatsApp Business API endpoint (Meta Cloud API atau provider lain)</div>
           </div>
           <div class="mb-3">
             <label class="form-label">API Key / Access Token</label>
             <input type="password" name="whatsapp_api_key" class="form-control font-monospace" value="<%= settings.whatsapp_api_key || '' %>" placeholder="EAAG...">
+            <div class="form-text">Gunakan <strong>Permanent Token</strong> (System User) untuk produksi. Token sementara dari Graph Explorer hanya 24 jam.</div>
           </div>
           <div class="row mb-3">
             <div class="col-md-6">
@@ -151,29 +152,24 @@
   </div>
 
   <div class="col-md-6 mb-3">
-    <div class="card">
-      <div class="card-header"><h6 class="mb-0"><i class="bi bi-info-circle"></i> Informasi Integrasi</h6></div>
+    <div class="card border-success">
+      <div class="card-header bg-success bg-opacity-10"><h6 class="mb-0"><i class="bi bi-key"></i> Cara Dapatkan Permanent Token (Gratis)</h6></div>
       <div class="card-body small">
-        <h6>Telegram Bot Inbound</h6>
-        <p>Fitur ini memungkinkan staf melapor langsung via chat Telegram tanpa membuka web. Pengguna perlu mengirim pesan ke bot dan mengikuti panduan interaktif.</p>
-        <p><strong>Cara setup:</strong></p>
-        <ol>
-          <li>Buat bot di @BotFather dan masukkan token di atas</li>
-          <li>Aktifkan "Telegram Bot Inbound"</li>
-          <li>Untuk polling: biarkan Webhook URL kosong</li>
-          <li>Untuk webhook: masukkan URL server Anda</li>
-          <li>Daftarkan pengguna dengan format username: <code>tg_[chat_id]</code></li>
+        <p class="mb-2"><strong>Token permanen tidak expired</strong> — cocok untuk produksi. Ikuti langkah ini:</p>
+        <ol class="mb-3">
+          <li>Buka <a href="https://business.facebook.com/settings/system-users" target="_blank" class="text-decoration-none"><strong>Meta Business Settings → System Users</strong></a></li>
+          <li>Klik <strong>Add</strong> → Buat <em>System User</em> (role: Admin)</li>
+          <li>Pilih System User tadi → <strong>Generate New Token</strong></li>
+          <li>Centang: <code>whatsapp_business_management</code> + <code>whatsapp_business_messaging</code></li>
+          <li>Copy token → Paste ke field <strong>API Key / Access Token</strong> di atas</li>
+          <li>Phone Number ID: lihat di <strong>WhatsApp Accounts → Settings → Phone Numbers</strong></li>
         </ol>
-        <hr>
-        <h6>WhatsApp Business API</h6>
-        <p>Integrasi ini mengirim notifikasi WhatsApp ke teknisi saat ada tiket/laporan baru. Memerlukan akun WhatsApp Business API (Meta Cloud API atau provider seperti Fonnte/Wablas).</p>
-        <hr>
-        <h6>Auto-Assignment</h6>
-        <p>Sistem akan otomatis menugaskan laporan/tiket ke teknisi berdasarkan spesialisasi dan jumlah beban kerja. Atur profil teknisi di menu <a href="/admin/technicians">Teknisi</a>.</p>
+        <div class="alert alert-info py-2 mb-0">
+          <i class="bi bi-info-circle"></i> <strong>Gratis:</strong> 1.000 percakapan/bln. Di atasnya ~$0.005–$0.09/percakapan (Indonesia).
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 <!-- 2FA Section -->
 <div class="row mt-3">
