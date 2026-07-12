@@ -85,7 +85,7 @@
             </td>
             <td><%= t.pelapor ? t.pelapor.nama_lengkap : '-' %></td>
             <td><% if (t.teknisi) { %><%= t.teknisi.nama_lengkap %><% } else { %><span class="text-muted">-</span><% } %></td>
-            <td class="small text-muted"><%= t.created_at %></td>
+            <td class="small text-muted"><%= t.created_at ? new Date(t.created_at).toLocaleString('id-ID') : '-' %></td>
             <td><a href="/tickets/<%= t.id %>" class="btn btn-sm btn-outline-primary btn-3d"><i class="bi bi-eye"></i></a></td>
           </tr>
           <% }); } %>
