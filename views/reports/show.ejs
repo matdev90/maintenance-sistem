@@ -214,12 +214,41 @@
           var invTime = report.tgl_investigasi && report.tgl_validasi ? Math.round((new Date(report.tgl_investigasi) - new Date(report.tgl_validasi)) / (1000*60*60)) : null;
           var repTime = report.tgl_selesai && report.tgl_mulai_perbaikan ? Math.round((new Date(report.tgl_selesai) - new Date(report.tgl_mulai_perbaikan)) / (1000*60*60)) : null;
           var totTime = report.tgl_selesai && report.created_at ? Math.round((new Date(report.tgl_selesai) - new Date(report.created_at)) / (1000*60*60)) : null;
+          var slaMap = {};
+          slaTargets.forEach(function(s) { slaMap[s.prioritas] = s; });
+          var sla = slaMap[report.prioritas];
+          function slaBadge(actual, target) {
+            if (actual === null || !target) return '<span class="text-muted">-</span>';
+            return actual <= target
+              ? '<span class="text-success"><i class="bi bi-check-circle-fill"></i> ' + actual + ' jam (target ' + target + ')</span>'
+              : '<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> ' + actual + ' jam (target ' + target + ')</span>';
+          }
           %>
           <tr><th>Response Time</th><td><%= respTime !== null ? respTime + ' jam' : '-' %></td></tr>
-          <tr><th>Investigation Time</th><td><%= invTime !== null ? invTime + ' jam' : '-' %></td></tr>
+          <tr><th>Investigasi</th><td><%= invTime !== null ? invTime + ' jam' : '-' %></td></tr>
           <tr><th>Repair Time</th><td><%= repTime !== null ? repTime + ' jam' : '-' %></td></tr>
           <tr><th>Total Resolution</th><td><strong><%= totTime !== null ? totTime + ' jam' : '-' %></strong></td></tr>
         </table>
+
+        <% if (sla) { %>
+        <hr>
+        <h6>SLA Target <%= report.prioritas.toUpperCase() %>:</h6>
+        <table class="table table-sm table-bordered">
+          <tr><th>Tahap</th><th>Status</th></tr>
+          <tr>
+            <td>Validasi</td>
+            <td><%- slaBadge(respTime, sla.batas_validasi_jam) %></td>
+          </tr>
+          <tr>
+            <td>Investigasi</td>
+            <td><%- slaBadge(invTime, sla.batas_investigasi_jam) %></td>
+          </tr>
+          <tr>
+            <td>Selesai</td>
+            <td><%- slaBadge(totTime, sla.batas_selesai_jam) %></td>
+          </tr>
+        </table>
+        <% } %>
       </div>
     </div>
 

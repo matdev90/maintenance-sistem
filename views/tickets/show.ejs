@@ -203,12 +203,42 @@
     </div>
 
     <!-- Info -->
-    <div class="card">
+    <div class="card mb-3">
       <div class="card-header"><h6 class="mb-0"><i class="bi bi-info-circle"></i> Informasi</h6></div>
       <div class="card-body small">
         <div class="mb-1"><strong>Dibuat:</strong> <%= ticket.created_at %></div>
         <div class="mb-1"><strong>Update:</strong> <%= ticket.updated_at %></div>
         <% if (ticket.tgl_selesai) { %><div class="mb-1"><strong>Selesai:</strong> <%= ticket.tgl_selesai %></div><% } %>
+      </div>
+    </div>
+
+    <!-- SLA -->
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-stopwatch"></i> SLA</h6></div>
+      <div class="card-body small">
+        <% 
+        var slaMap = {};
+        slaTargets.forEach(function(s) { slaMap[s.prioritas] = s; });
+        var ticketSlaMap = { rendah: 'ringan', sedang: 'sedang', tinggi: 'berat', kritis: 'kritis' };
+        var slaKey = ticketSlaMap[ticket.prioritas] || ticket.prioritas;
+        var sla = slaMap[slaKey];
+        var totJam = ticket.tgl_selesai ? Math.round((new Date(ticket.tgl_selesai) - new Date(ticket.created_at)) / (1000*60*60)) : null;
+        %>
+        <div class="mb-1"><strong>Prioritas:</strong> <span class="badge <%= {rendah:'bg-success', sedang:'bg-warning', tinggi:'bg-danger', kritis:'bg-dark'}[ticket.prioritas] %>"><%= ticket.prioritas %></span></div>
+        <% if (sla) { %>
+        <div class="mb-1"><strong>Target Selesai:</strong> <%= sla.batas_selesai_jam %> jam</div>
+        <% if (totJam !== null) { %>
+        <div class="mb-0">
+          <strong>Total:</strong> <%= totJam %> jam
+          <% if (totJam <= sla.batas_selesai_jam) { %>
+            <span class="text-success"><i class="bi bi-check-circle-fill"></i> Sesuai SLA</span>
+          <% } else { %>
+            <span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Melebihi SLA</span>
+          <% } %>
+        </div>
+        <% } } else { %>
+        <div class="text-muted">Target SLA tidak tersedia untuk prioritas ini</div>
+        <% } %>
       </div>
     </div>
   </div>

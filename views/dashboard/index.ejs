@@ -104,6 +104,57 @@
   </div>
 </div>
 
+<!-- SLA Compliance -->
+<div class="row g-3 mb-4">
+  <div class="col-md-12">
+    <div class="card card-3d-chart border-0 rounded-4">
+      <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-shield-check me-2 text-success"></i> SLA Compliance</h6>
+      </div>
+      <div class="card-body">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-3 text-center">
+            <div style="position:relative; display:inline-block;">
+              <canvas id="chartSlaGauge" width="160" height="160"></canvas>
+              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+                <h2 class="mb-0 fw-bold"><%= slaCompliance %>%</h2>
+                <small class="text-muted">Sesuai SLA</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-check-circle-fill text-success fs-5 me-2"></i>
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between"><span>Dalam SLA</span><strong><%= withinSla %></strong></div>
+                <div class="progress" style="height:6px"><div class="progress-bar bg-success" style="width:<%= withinSla + violatedSla > 0 ? (withinSla/(withinSla+violatedSla)*100) : 100 %>%"></div></div>
+              </div>
+            </div>
+            <div class="d-flex align-items-center">
+              <i class="bi bi-exclamation-triangle-fill text-danger fs-5 me-2"></i>
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between"><span>Violasi SLA</span><strong><%= violatedSla %></strong></div>
+                <div class="progress" style="height:6px"><div class="progress-bar bg-danger" style="width:<%= withinSla + violatedSla > 0 ? (violatedSla/(withinSla+violatedSla)*100) : 0 %>%"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-5">
+            <h6 class="fw-bold mb-2">Violasi per Prioritas</h6>
+            <div id="slaViolationList">
+              <% slaViolations.forEach(function(v) { %>
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="badge <%= {ringan:'bg-success', sedang:'bg-warning', berat:'bg-danger', kritis:'bg-dark'}[v.prioritas] %>"><%= v.prioritas %></span>
+                <span><%= v.total %> pelanggaran</span>
+              </div>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Tiket Terbaru -->
 <div class="card card-3d-chart border-0 rounded-4 mb-4">
   <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pt-3">
@@ -393,6 +444,31 @@ document.addEventListener('DOMContentLoaded', function() {
       responsive: true, animation: { duration: 2000, easing: 'easeOutQuart' },
       plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, font: { size: 11 } } } },
       scales: { r: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { display: false } } }
+    }
+  });
+});
+</script>
+
+<script>
+// SLA Gauge Chart
+document.addEventListener('DOMContentLoaded', function() {
+  var ctx = document.getElementById('chartSlaGauge');
+  if (!ctx) return;
+  var compliance = <%= slaCompliance %>;
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [compliance, 100 - compliance],
+        backgroundColor: compliance >= 80 ? ['#198754', '#e9ecef'] : compliance >= 50 ? ['#ffc107', '#e9ecef'] : ['#dc3545', '#e9ecef'],
+        borderWidth: 0,
+        cutout: '80%'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } }
     }
   });
 });

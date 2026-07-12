@@ -76,11 +76,12 @@
             <th>Response (jam)</th>
             <th>Tgl Selesai</th>
             <th>Total (jam)</th>
+            <th>SLA</th>
           </tr>
         </thead>
         <tbody>
           <% if (data.length === 0) { %>
-          <tr><td colspan="14" class="text-center text-muted py-4">Tidak ada data</td></tr>
+          <tr><td colspan="15" class="text-center text-muted py-4">Tidak ada data</td></tr>
           <% } %>
           <% data.forEach(function(d, i) { %>
           <tr>
@@ -98,6 +99,15 @@
             <td><strong><%= d.responseTime || '-' %></strong></td>
             <td><%= d.tgl_selesai ? new Date(d.tgl_selesai).toLocaleString('id-ID') : '-' %></td>
             <td><strong><%= d.totalTime || '-' %></strong></td>
+            <td>
+              <% if (d.slaStatus === 'violation') { %>
+                <span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Violation</span>
+              <% } else if (d.slaStatus === 'ok' || (d.respHours !== null && d.slaTarget)) { %>
+                <span class="text-success"><i class="bi bi-check-circle-fill"></i> OK</span>
+              <% } else { %>
+                <span class="text-muted">-</span>
+              <% } %>
+            </td>
           </tr>
           <% }) %>
         </tbody>

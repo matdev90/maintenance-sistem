@@ -1,5 +1,5 @@
 const { Op, fn, col } = require('sequelize');
-const { Ticket, TicketHistory, Unit, DeviceCategory, User, TechnicianProfile } = require('../models');
+const { Ticket, TicketHistory, Unit, DeviceCategory, User, TechnicianProfile, Report, SlaTarget } = require('../models');
 
 exports.index = async (req, res) => {
   const where = {};
@@ -137,10 +137,61 @@ exports.index = async (req, res) => {
     technicianPerf.sort((a, b) => b.completed - a.completed);
   }
 
+  // SLA Compliance
+  const slaTargets = await SlaTarget.findAll();
+  const slaMap = {};
+  slaTargets.forEach(s => { slaMap[s.prioritas] = s; });
+  const ticketToSlaPrio = { rendah: 'ringan', sedang: 'sedang', tinggi: 'berat', kritis: 'kritis' };
+
+  const completedReports = await Report.findAll({
+    where: { tgl_selesai: { [Op.ne]: null } },
+    attributes: ['id', 'prioritas', 'created_at', 'tgl_validasi', 'tgl_selesai'],
+    raw: true
+  });
+
+  let withinSla = 0, violatedSla = 0;
+  completedReports.forEach(r => {
+    const sla = slaMap[r.prioritas];
+    if (!sla) return;
+    const respHours = r.tgl_validasi ? (new Date(r.tgl_validasi) - new Date(r.created_at)) / (1000 * 60 * 60) : 0;
+    const totalHours = (new Date(r.tgl_selesai) - new Date(r.created_at)) / (1000 * 60 * 60);
+    if (respHours <= sla.batas_validasi_jam && totalHours <= sla.batas_selesai_jam) withinSla++;
+    else violatedSla++;
+  });
+
+  const completedTicketsForSla = await Ticket.findAll({
+    where: { tgl_selesai: { [Op.ne]: null } },
+    attributes: ['id', 'prioritas', 'created_at', 'tgl_selesai'],
+    raw: true
+  });
+  completedTicketsForSla.forEach(t => {
+    const slaKey = ticketToSlaPrio[t.prioritas] || t.prioritas;
+    const sla = slaMap[slaKey];
+    if (!sla) return;
+    const totalHours = (new Date(t.tgl_selesai) - new Date(t.created_at)) / (1000 * 60 * 60);
+    if (totalHours <= sla.batas_selesai_jam) withinSla++;
+    else violatedSla++;
+  });
+
+  const slaCompliance = (withinSla + violatedSla) > 0 ? Math.round(withinSla / (withinSla + violatedSla) * 100) : 100;
+
+  // SLA violations by priority (for chart)
+  const slaViolations = [];
+  slaTargets.forEach(s => {
+    const count = completedReports.filter(r => {
+      if (r.prioritas !== s.prioritas) return false;
+      const respHours = r.tgl_validasi ? (new Date(r.tgl_validasi) - new Date(r.created_at)) / (1000 * 60 * 60) : 0;
+      const totalHours = (new Date(r.tgl_selesai) - new Date(r.created_at)) / (1000 * 60 * 60);
+      return respHours > s.batas_validasi_jam || totalHours > s.batas_selesai_jam;
+    }).length;
+    slaViolations.push({ prioritas: s.prioritas, total: count });
+  });
+
   res.render('dashboard/index', {
     title: 'Dashboard',
     ticketOpen, ticketProgress, ticketResolved, allCount, ticketBaru,
     ticketsByUnit, ticketsByStatus, monthlyTrend, byPriority, byCategory,
-    avgResponseStr, avgResolutionStr, top10Units, technicianPerf
+    avgResponseStr, avgResolutionStr, top10Units, technicianPerf,
+    slaCompliance, slaViolations, withinSla, violatedSla
   });
 };

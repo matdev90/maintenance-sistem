@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Ticket, TicketHistory, Unit, User, Rating, TechnicianProfile, Report, Layanan, DeviceCategory } = require('../models');
+const { Ticket, TicketHistory, Unit, User, Rating, TechnicianProfile, Report, Layanan, DeviceCategory, SlaTarget } = require('../models');
 const { autoAssignTicket } = require('../utils/autoAssign');
 const { broadcastNotification } = require('../utils/socket');
 const { notifyTicketWhatsApp } = require('../utils/whatsapp');
@@ -158,10 +158,11 @@ exports.show = async (req, res) => {
   }
 
   const teknisi = await User.findAll({ where: { role: 'teknisi' } });
+  const slaTargets = await SlaTarget.findAll();
 
   res.render('tickets/show', {
     title: 'Tiket Laporan ' + ticket.no_tiket,
-    ticket, teknisi
+    ticket, teknisi, slaTargets
   });
 };
 

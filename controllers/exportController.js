@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { Report, Ticket, TicketHistory, Unit, User, DeviceCategory } = require('../models');
+const { Report, Ticket, TicketHistory, Unit, User, DeviceCategory, SlaTarget } = require('../models');
 const { durMs, formatDuration } = require('../utils/helpers');
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
@@ -52,10 +52,18 @@ const offset = ((parseInt(page) || 1) - 1) * limit;
 
   const totalCount = reports.length + tickets.length;
   const units = await Unit.findAll({ order: [['nama_unit', 'ASC']] });
+  const slaTargets = await SlaTarget.findAll();
+  const slaMap = {};
+  slaTargets.forEach(s => { slaMap[s.prioritas] = s; });
+  const ticketSlaMap = { rendah: 'ringan', sedang: 'sedang', tinggi: 'berat', kritis: 'kritis' };
 
   const reportData = reports.map(r => {
     const responseMs = durMs(r.tgl_validasi, r.created_at);
     const totalMs = durMs(r.tgl_selesai, r.created_at);
+    const sla = slaMap[r.prioritas];
+    const respHours = responseMs !== null ? Math.round(responseMs / (1000 * 60 * 60)) : null;
+    const totalHours = totalMs !== null ? Math.round(totalMs / (1000 * 60 * 60)) : null;
+    const slaStatus = sla && respHours !== null && respHours > sla.batas_validasi_jam ? 'violation' : (totalHours !== null && sla && totalHours > sla.batas_selesai_jam ? 'violation' : 'ok');
     return {
       tipe: 'Laporan',
       no: '#' + r.id,
@@ -69,7 +77,8 @@ const offset = ((parseInt(page) || 1) - 1) * limit;
       tgl_ambil: r.tgl_validasi,
       tgl_selesai: r.tgl_selesai,
       responseTime: formatDuration(responseMs),
-      totalTime: formatDuration(totalMs)
+      totalTime: formatDuration(totalMs),
+      slaStatus, respHours, totalHours, slaTarget: sla ? { validasi: sla.batas_validasi_jam, selesai: sla.batas_selesai_jam } : null
     };
   });
 
@@ -90,6 +99,11 @@ const offset = ((parseInt(page) || 1) - 1) * limit;
     const tglAmbil = responseTimeMap[t.id] || null;
     const responseMs = durMs(tglAmbil, t.created_at);
     const totalMs = durMs(t.tgl_selesai, t.created_at);
+    const slaKey = ticketSlaMap[t.prioritas] || t.prioritas;
+    const sla = slaMap[slaKey];
+    const respHours = responseMs !== null ? Math.round(responseMs / (1000 * 60 * 60)) : null;
+    const totalHours = totalMs !== null ? Math.round(totalMs / (1000 * 60 * 60)) : null;
+    const slaStatus = sla && respHours !== null && respHours > sla.batas_validasi_jam ? 'violation' : (totalHours !== null && sla && totalHours > sla.batas_selesai_jam ? 'violation' : 'ok');
     return {
       tipe: 'Tiket',
       no: t.no_tiket,
@@ -103,7 +117,8 @@ const offset = ((parseInt(page) || 1) - 1) * limit;
       tgl_ambil: tglAmbil,
       tgl_selesai: t.tgl_selesai,
       responseTime: formatDuration(responseMs),
-      totalTime: formatDuration(totalMs)
+      totalTime: formatDuration(totalMs),
+      slaStatus, respHours, totalHours, slaTarget: sla ? { validasi: sla.batas_validasi_jam, selesai: sla.batas_selesai_jam } : null
     };
   });
 
@@ -116,7 +131,7 @@ const offset = ((parseInt(page) || 1) - 1) * limit;
   res.render('export/laporan_mutu', {
     title: 'Laporan Mutu Pelayanan',
     data: paginatedData, units, filters: { unit, prioritas, dari, sampai, status },
-    querystring, total: totalCount,
+    querystring, total: totalCount, slaTargets,
     pagination: { total: totalCount, totalPages, currentPage, limit }
   });
 };
