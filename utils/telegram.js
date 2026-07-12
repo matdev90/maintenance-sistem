@@ -75,4 +75,4 @@ async function notifyStatusChange(report, pelaporNama, unitNama) {
   await sendTelegramNotification(msg);
 }
 
-module.exports = { sendTelegramNotification, testTelegramConnection, notifyLaporanBaru, notifyStatusChange };
+module.exports = { sendTelegramNotification, testTelegramConnection, notifyLaporanBaru, notifyStatusChange, getTelegramConfig };
