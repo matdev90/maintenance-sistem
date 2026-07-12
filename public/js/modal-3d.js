@@ -177,7 +177,8 @@ document.addEventListener('click', function (e) {
         cancelText: 'Batal',
         type: 'danger',
         onConfirm: function () {
-          window.location.href = href;
+          Modal3D.showLoading('KELUAR');
+          setTimeout(function () { window.location.href = href; }, 350);
         }
       });
       return;
