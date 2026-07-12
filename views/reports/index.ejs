@@ -91,7 +91,7 @@
               <span class="badge <%= sc[r.status] || 'bg-secondary' %>"><%= r.status.replace(/_/g,' ') %></span>
             </td>
             <td><%= r.pelapor ? r.pelapor.nama_lengkap : '-' %></td>
-            <td><%= r.created_at ? new Date(r.created_at).toLocaleDateString('id-ID') : '-' %></td>
+            <td><%= fmtDate(r.created_at) %></td>
             <td>
               <a href="/reports/<%= r.id %>" class="btn btn-sm btn-info" title="Detail">
                 <i class="bi bi-eye"></i>

@@ -57,7 +57,7 @@
         <% if (shifts.length) { shifts.forEach(function(s, i) { %>
         <tr>
           <td><%= i + 1 %></td>
-          <td><%= new Date(s.tanggal).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) %></td>
+          <td><%= fmtDate(s.tanggal) %></td>
           <td><%= s.teknisi ? s.teknisi.nama_lengkap : '-' %></td>
           <td><%= s.layanan ? s.layanan.nama_layanan : '-' %></td>
           <td>

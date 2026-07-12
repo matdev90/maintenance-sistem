@@ -26,7 +26,7 @@
           <div class="col-md-6">
             <table class="table table-sm">
               <tr><th>Pelapor</th><td><%= report.pelapor ? report.pelapor.nama_lengkap : '-' %></td></tr>
-              <tr><th>Tgl Lapor</th><td><%= report.created_at ? new Date(report.created_at).toLocaleString('id-ID') : '-' %></td></tr>
+              <tr><th>Tgl Lapor</th><td><%= fmtDate(report.created_at) %></td></tr>
               <tr><th>Validator</th><td><%= report.validator ? report.validator.nama_lengkap : '-' %></td></tr>
               <tr><th>Investigator</th><td><%= report.investigator ? report.investigator.nama_lengkap : '-' %></td></tr>
               <tr><th>Teknisi</th><td><%= report.teknisi ? report.teknisi.nama_lengkap : '-' %></td></tr>
@@ -186,23 +186,23 @@
         <table class="table table-sm">
           <tr>
             <td><span class="badge bg-secondary">Dilaporkan</span></td>
-            <td><%= report.created_at ? new Date(report.created_at).toLocaleString('id-ID') : '-' %></td>
+            <td><%= fmtDate(report.created_at) %></td>
           </tr>
           <tr>
             <td><span class="badge bg-info">Divalidasi</span></td>
-            <td><%= report.tgl_validasi ? new Date(report.tgl_validasi).toLocaleString('id-ID') : '-' %></td>
+            <td><%= fmtDate(report.tgl_validasi) %></td>
           </tr>
           <tr>
             <td><span class="badge bg-primary">Investigasi</span></td>
-            <td><%= report.tgl_investigasi ? new Date(report.tgl_investigasi).toLocaleString('id-ID') : '-' %></td>
+            <td><%= fmtDate(report.tgl_investigasi) %></td>
           </tr>
           <tr>
             <td><span class="badge bg-warning">Diperbaiki</span></td>
-            <td><%= report.tgl_mulai_perbaikan ? new Date(report.tgl_mulai_perbaikan).toLocaleString('id-ID') : '-' %></td>
+            <td><%= fmtDate(report.tgl_mulai_perbaikan) %></td>
           </tr>
           <tr>
             <td><span class="badge bg-success">Selesai</span></td>
-            <td><%= report.tgl_selesai ? new Date(report.tgl_selesai).toLocaleString('id-ID') : '-' %></td>
+            <td><%= fmtDate(report.tgl_selesai) %></td>
           </tr>
         </table>
 
@@ -260,7 +260,7 @@
             report.trackings.forEach(function(t) { %>
           <li class="list-group-item small">
             <span class="badge bg-secondary"><%= t.status.replace(/_/g,' ') %></span>
-            <span class="text-muted"><%= t.created_at ? new Date(t.created_at).toLocaleString('id-ID') : '' %></span>
+            <span class="text-muted"><%= fmtDate(t.created_at) %></span>
             <% if (t.catatan) { %><br><em><%= t.catatan %></em><% } %>
           </li>
           <% }); } else { %>

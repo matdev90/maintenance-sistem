@@ -234,7 +234,7 @@ exports.updateTechnician = async (req, res) => {
 
 exports.units = async (req, res) => {
   const { page, q } = req.query;
-  const limit = 15;
+  const limit = 10;
   const offset = ((parseInt(page) || 1) - 1) * limit;
 
   const where = {};
@@ -306,7 +306,7 @@ exports.destroyUnit = async (req, res) => {
 
 exports.categories = async (req, res) => {
   const { page, q } = req.query;
-  const limit = 15;
+  const limit = 10;
   const offset = ((parseInt(page) || 1) - 1) * limit;
 
   const where = {};

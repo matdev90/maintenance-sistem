@@ -90,7 +90,7 @@
           <% logs.forEach(function(l, i) { var no = (pagination.currentPage - 1) * pagination.limit + i + 1; %>
           <tr>
             <td><a href="/admin/logs/<%= l.id %>"><%= no %></a></td>
-            <td><small><%= new Date(l.created_at).toLocaleString('id-ID').replace(/\./g, ':') %></small></td>
+            <td><small><%= fmtDate(l.created_at) %></small></td>
             <td><small><%= l.username || '-' %></small></td>
             <td>
               <% var badges = { login: 'info', logout: 'secondary', login_failed: 'danger', create: 'success', store: 'success', update: 'primary', delete: 'danger', validasi: 'success', investigasi: 'info', ambil_tugas: 'warning', selesai: 'success', rating: 'warning' } %>

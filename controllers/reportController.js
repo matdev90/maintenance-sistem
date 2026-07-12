@@ -9,7 +9,7 @@ const { logReport } = require('../utils/logger');
 
 exports.index = async (req, res) => {
   const { unit, status, prioritas, dari, sampai, q, page } = req.query;
-  const limit = 15;
+  const limit = 10;
   const offset = ((parseInt(page) || 1) - 1) * limit;
 
   const where = {};

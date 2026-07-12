@@ -72,6 +72,8 @@ app.use(async (req, res, next) => {
   res.locals.error = req.flash('error');
   res.locals.user = req.session.user || null;
   res.locals.version = '1.0.0';
+  const { formatDateIndonesian } = require('./utils/helpers');
+  res.locals.fmtDate = formatDateIndonesian;
   try {
     res.locals.settings = await getSettings();
   } catch (e) {

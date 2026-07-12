@@ -199,7 +199,7 @@
             </td>
             <td><small><%= t.pelapor ? t.pelapor.nama_lengkap : '-' %></small></td>
             <td><small><%= t.teknisi ? t.teknisi.nama_lengkap : '-' %></small></td>
-            <td><small class="text-muted"><%= t.created_at ? new Date(t.created_at).toLocaleDateString('id-ID') : '-' %></small></td>
+            <td><small class="text-muted"><%= fmtDate(t.created_at) %></small></td>
             <td class="text-center">
               <a href="/tickets/<%= t.id %>" class="btn btn-sm btn-outline-primary rounded-circle" style="width:32px;height:32px;"><i class="bi bi-eye"></i></a>
             </td>

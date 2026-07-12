@@ -10,7 +10,7 @@
   <div class="card-body">
     <table class="table table-bordered table-sm">
       <tr><th width="140">ID Log</th><td><%= log.id %></td></tr>
-      <tr><th>Waktu</th><td><%= new Date(log.created_at).toLocaleString('id-ID').replace(/\./g, ':') %></td></tr>
+      <tr><th>Waktu</th><td><%= fmtDate(log.created_at) %></td></tr>
       <tr><th>User</th><td><%= log.username || '-' %></td></tr>
       <tr><th>ID User</th><td><%= log.id_user || '-' %></td></tr>
       <tr><th>Aksi</th><td><span class="badge bg-primary"><%= log.action %></span></td></tr>

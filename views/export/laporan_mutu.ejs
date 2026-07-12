@@ -94,10 +94,10 @@
             <td><span class="badge bg-secondary"><%= {open:'Terbuka', in_progress:'Dalam Pengerjaan', resolved:'Terselesaikan', closed:'Ditutup', reopened:'Dibuka Ulang'}[d.status] || d.status.replace(/_/g,' ') %></span></td>
             <td><%= d.pelapor %></td>
             <td><%= d.teknisi || '-' %></td>
-            <td><%= d.tgl_lapor ? new Date(d.tgl_lapor).toLocaleString('id-ID') : '-' %></td>
-            <td><%= d.tgl_ambil ? new Date(d.tgl_ambil).toLocaleString('id-ID') : '-' %></td>
+            <td><%= fmtDate(d.tgl_lapor) %></td>
+            <td><%= fmtDate(d.tgl_ambil) %></td>
             <td><strong><%= d.responseTime || '-' %></strong></td>
-            <td><%= d.tgl_selesai ? new Date(d.tgl_selesai).toLocaleString('id-ID') : '-' %></td>
+            <td><%= fmtDate(d.tgl_selesai) %></td>
             <td><strong><%= d.totalTime || '-' %></strong></td>
             <td>
               <% if (d.slaStatus === 'violation') { %>

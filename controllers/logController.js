@@ -3,7 +3,7 @@ const { AuditLog } = require('../models');
 
 exports.index = async (req, res) => {
   const { action, entity_type, username, dari, sampai, q, page } = req.query;
-  const limit = 50;
+  const limit = 10;
   const offset = ((parseInt(page) || 1) - 1) * limit;
 
   const where = {};
