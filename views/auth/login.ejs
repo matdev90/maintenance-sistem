@@ -299,12 +299,16 @@
 
     // Login form 3D loading
     document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
       const btn = document.getElementById('loginBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> MEMVALIDASI...';
       if (typeof Modal3D !== 'undefined') {
         Modal3D.showLoading('MEMVALIDASI');
       }
+      setTimeout(function() {
+        e.target.submit();
+      }, 400);
     });
 
     // Input focus effects
