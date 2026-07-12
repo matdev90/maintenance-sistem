@@ -78,8 +78,67 @@
         </form>
       </div>
     </div>
+  </div>
+</div>
 
-    <div class="card mt-3">
+<div class="row mt-3">
+  <div class="col-md-6 mb-3">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-whatsapp"></i> WhatsApp Business API</h6></div>
+      <div class="card-body">
+        <form method="POST" action="/admin/settings/whatsapp">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3 form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="whatsapp_enabled" name="whatsapp_enabled" value="true"
+              <%= settings.whatsapp_enabled === 'true' ? 'checked' : '' %>>
+            <label class="form-check-label" for="whatsapp_enabled">Aktifkan Integrasi WhatsApp</label>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">API URL</label>
+            <input type="url" name="whatsapp_api_url" class="form-control" value="<%= settings.whatsapp_api_url || '' %>" placeholder="https://graph.facebook.com/v21.0">
+            <div class="form-text">WhatsApp Business API endpoint (Meta Cloud API atau provider lain)</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">API Key / Access Token</label>
+            <input type="password" name="whatsapp_api_key" class="form-control font-monospace" value="<%= settings.whatsapp_api_key || '' %>" placeholder="EAAG...">
+            <div class="form-text">Gunakan <strong>Permanent Token</strong> (System User) untuk produksi. Token sementara dari Graph Explorer hanya 24 jam.</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Phone Number ID</label>
+              <input type="text" name="whatsapp_phone_number_id" class="form-control" value="<%= settings.whatsapp_phone_number_id || '' %>" placeholder="1234567890">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Verify Token</label>
+              <input type="text" name="whatsapp_verify_token" class="form-control" value="<%= settings.whatsapp_verify_token || '' %>" placeholder="token_verify_anda">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-save"></i> Simpan</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-3 border-success">
+      <div class="card-header bg-success bg-opacity-10"><h6 class="mb-0"><i class="bi bi-key"></i> Cara Dapatkan Permanent Token (Gratis)</h6></div>
+      <div class="card-body small">
+        <p class="mb-2"><strong>Token permanen tidak expired</strong> — cocok untuk produksi. Ikuti langkah ini:</p>
+        <ol class="mb-3">
+          <li>Buka <a href="https://business.facebook.com/settings/system-users" target="_blank" class="text-decoration-none"><strong>Meta Business Settings → System Users</strong></a></li>
+          <li>Klik <strong>Add</strong> → Buat <em>System User</em> (role: Admin)</li>
+          <li>Pilih System User tadi → <strong>Generate New Token</strong></li>
+          <li>Centang: <code>whatsapp_business_management</code> + <code>whatsapp_business_messaging</code></li>
+          <li>Copy token → Paste ke field <strong>API Key / Access Token</strong> di atas</li>
+          <li>Phone Number ID: lihat di <strong>WhatsApp Accounts → Settings → Phone Numbers</strong></li>
+        </ol>
+        <div class="alert alert-info py-2 mb-0">
+          <i class="bi bi-info-circle"></i> <strong>Gratis:</strong> 1.000 percakapan/bln. Di atasnya ~$0.005–$0.09/percakapan (Indonesia).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 mb-3">
+    <div class="card">
       <div class="card-header"><h6 class="mb-0"><i class="bi bi-stopwatch"></i> Target SLA</h6></div>
       <div class="card-body p-0">
         <table class="table table-sm mb-0">
@@ -170,65 +229,6 @@
   </div>
 </div>
 
-<div class="row mt-3">
-  <div class="col-md-6 mb-3">
-    <div class="card">
-      <div class="card-header"><h6 class="mb-0"><i class="bi bi-whatsapp"></i> WhatsApp Business API</h6></div>
-      <div class="card-body">
-        <form method="POST" action="/admin/settings/whatsapp">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-          <div class="mb-3 form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="whatsapp_enabled" name="whatsapp_enabled" value="true"
-              <%= settings.whatsapp_enabled === 'true' ? 'checked' : '' %>>
-            <label class="form-check-label" for="whatsapp_enabled">Aktifkan Integrasi WhatsApp</label>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">API URL</label>
-            <input type="url" name="whatsapp_api_url" class="form-control" value="<%= settings.whatsapp_api_url || '' %>" placeholder="https://graph.facebook.com/v21.0">
-            <div class="form-text">WhatsApp Business API endpoint (Meta Cloud API atau provider lain)</div>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">API Key / Access Token</label>
-            <input type="password" name="whatsapp_api_key" class="form-control font-monospace" value="<%= settings.whatsapp_api_key || '' %>" placeholder="EAAG...">
-            <div class="form-text">Gunakan <strong>Permanent Token</strong> (System User) untuk produksi. Token sementara dari Graph Explorer hanya 24 jam.</div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label class="form-label">Phone Number ID</label>
-              <input type="text" name="whatsapp_phone_number_id" class="form-control" value="<%= settings.whatsapp_phone_number_id || '' %>" placeholder="1234567890">
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Verify Token</label>
-              <input type="text" name="whatsapp_verify_token" class="form-control" value="<%= settings.whatsapp_verify_token || '' %>" placeholder="token_verify_anda">
-            </div>
-          </div>
-          <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-save"></i> Simpan</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-6 mb-3">
-    <div class="card border-success">
-      <div class="card-header bg-success bg-opacity-10"><h6 class="mb-0"><i class="bi bi-key"></i> Cara Dapatkan Permanent Token (Gratis)</h6></div>
-      <div class="card-body small">
-        <p class="mb-2"><strong>Token permanen tidak expired</strong> — cocok untuk produksi. Ikuti langkah ini:</p>
-        <ol class="mb-3">
-          <li>Buka <a href="https://business.facebook.com/settings/system-users" target="_blank" class="text-decoration-none"><strong>Meta Business Settings → System Users</strong></a></li>
-          <li>Klik <strong>Add</strong> → Buat <em>System User</em> (role: Admin)</li>
-          <li>Pilih System User tadi → <strong>Generate New Token</strong></li>
-          <li>Centang: <code>whatsapp_business_management</code> + <code>whatsapp_business_messaging</code></li>
-          <li>Copy token → Paste ke field <strong>API Key / Access Token</strong> di atas</li>
-          <li>Phone Number ID: lihat di <strong>WhatsApp Accounts → Settings → Phone Numbers</strong></li>
-        </ol>
-        <div class="alert alert-info py-2 mb-0">
-          <i class="bi bi-info-circle"></i> <strong>Gratis:</strong> 1.000 percakapan/bln. Di atasnya ~$0.005–$0.09/percakapan (Indonesia).
-        </div>
-      </div>
-    </div>
-  </div>
-
-<!-- 2FA Section -->
 <div class="row mt-3">
   <div class="col-md-12 mb-3">
     <div class="card border-warning">
