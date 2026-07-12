@@ -1,17 +1,34 @@
 /* global bootstrap */
 var Modal3D = {
+  _loadingStart: 0,
+  _loadingTimer: null,
   showLoading: function (message) {
     var el = document.getElementById('loading3d');
     if (!el) return;
+    this._loadingStart = Date.now();
     var text = el.querySelector('.loading-3d-text');
     if (text) text.textContent = message || 'Memproses...';
     el.style.display = 'flex';
     el.style.opacity = '1';
+    el.classList.add('active');
   },
   hideLoading: function () {
     var el = document.getElementById('loading3d');
     if (!el) return;
+    var elapsed = Date.now() - this._loadingStart;
+    var minDelay = 600;
+    if (elapsed < minDelay) {
+      if (this._loadingTimer) clearTimeout(this._loadingTimer);
+      this._loadingTimer = setTimeout(function () {
+        Modal3D._hideNow(el);
+      }, minDelay - elapsed);
+      return;
+    }
+    this._hideNow(el);
+  },
+  _hideNow: function (el) {
     el.style.opacity = '0';
+    el.classList.remove('active');
     setTimeout(function () { el.style.display = 'none'; }, 300);
   },
   showConfirm: function (opts) {
@@ -190,7 +207,9 @@ document.addEventListener('click', function (e) {
     var href = el.getAttribute('href');
     if (!href || href === '#' || href.startsWith('javascript:') || href.startsWith('http') || el.hasAttribute('data-bs-toggle') || el.hasAttribute('target')) return;
     if (el.closest('.sidebar') || el.closest('.navbar') || el.closest('.pagination') || el.closest('.btn-group')) {
+      e.preventDefault();
       Modal3D.showLoading();
+      setTimeout(function () { window.location.href = href; }, 350);
     }
   } catch (err) {
     console.error('Nav loading error:', err);
