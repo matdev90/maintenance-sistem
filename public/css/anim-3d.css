@@ -120,18 +120,18 @@
   transition: transform 0.5s ease;
 }
 
-/* --- 3D Loading Spinner --- */
+/* --- 3D Loading Spinner (Logo) --- */
 .loading-3d {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(12px);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 99999;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.4s ease;
 }
 
 .loading-3d.active {
@@ -140,55 +140,98 @@
 }
 
 .loading-3d-spinner {
-  perspective: 800px;
+  perspective: 1000px;
   text-align: center;
+  position: relative;
 }
 
-.spinner-3d-cube {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 20px;
+.spinner-3d-logo {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 25px;
   transform-style: preserve-3d;
-  animation: spinCube 2s infinite linear;
+  animation: logoFloat3D 3s ease-in-out infinite;
 }
 
-.spinner-3d-cube .face {
+.spinner-logo-img {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
   position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  animation: logoSpin 2.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  box-shadow: 0 0 40px rgba(102,126,234,0.3), 0 0 80px rgba(102,126,234,0.1);
+}
+
+.logo-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #667eea;
+  border-right-color: #764ba2;
+  transform: translate(-50%, -50%);
+  animation: ringSpin 1.8s linear infinite;
+}
+
+.logo-ring-2 {
+  width: 120px;
+  height: 120px;
+  border-top-color: #43e97b;
+  border-right-color: transparent;
+  border-bottom-color: #38f9d7;
+  animation: ringSpin 2.4s linear infinite reverse;
+}
+
+.logo-ring-3 {
   width: 80px;
   height: 80px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30px;
-  color: white;
-  background: rgba(102, 126, 234, 0.2);
-  backdrop-filter: blur(4px);
+  border-top-color: transparent;
+  border-right-color: #f093fb;
+  border-bottom-color: transparent;
+  border-left-color: #f5576c;
+  animation: ringSpin 1.4s linear infinite;
 }
 
-.spinner-3d-cube .face.front  { transform: rotateY(0deg) translateZ(40px); }
-.spinner-3d-cube .face.back   { transform: rotateY(180deg) translateZ(40px); }
-.spinner-3d-cube .face.right  { transform: rotateY(90deg) translateZ(40px); }
-.spinner-3d-cube .face.left   { transform: rotateY(-90deg) translateZ(40px); }
-.spinner-3d-cube .face.top    { transform: rotateX(90deg) translateZ(40px); }
-.spinner-3d-cube .face.bottom { transform: rotateX(-90deg) translateZ(40px); }
+@keyframes logoSpin {
+  0% { transform: translate(-50%, -50%) rotateY(0deg) scale(1); }
+  25% { transform: translate(-50%, -50%) rotateY(90deg) scale(1.05); }
+  50% { transform: translate(-50%, -50%) rotateY(180deg) scale(1); }
+  75% { transform: translate(-50%, -50%) rotateY(270deg) scale(1.05); }
+  100% { transform: translate(-50%, -50%) rotateY(360deg) scale(1); }
+}
 
-@keyframes spinCube {
-  0% { transform: rotateX(0) rotateY(0); }
-  100% { transform: rotateX(360deg) rotateY(360deg); }
+@keyframes ringSpin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes logoFloat3D {
+  0%, 100% { transform: rotateX(5deg) rotateY(0deg) translateY(0); }
+  25% { transform: rotateX(10deg) rotateY(5deg) translateY(-5px); }
+  50% { transform: rotateX(5deg) rotateY(10deg) translateY(-10px); }
+  75% { transform: rotateX(10deg) rotateY(5deg) translateY(-5px); }
 }
 
 .loading-3d-text {
   color: white;
-  font-size: 1.1rem;
-  letter-spacing: 2px;
-  animation: pulseText 1.5s ease-in-out infinite;
+  font-size: 1rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 300;
+  animation: pulseText 2s ease-in-out infinite;
 }
 
 @keyframes pulseText {
-  0%, 100% { opacity: 0.7; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
+  0%, 100% { opacity: 0.6; letter-spacing: 3px; }
+  50% { opacity: 1; letter-spacing: 5px; }
 }
 
 /* --- Modal 3D Animations --- */

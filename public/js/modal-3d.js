@@ -181,3 +181,18 @@ document.addEventListener('submit', function (e) {
     console.error('Modal3D submit error:', err);
   }
 });
+
+// Auto-show loading on navigation clicks (sidebar menu, navbar links, etc.)
+document.addEventListener('click', function (e) {
+  try {
+    var el = e.target.closest('a');
+    if (!el) return;
+    var href = el.getAttribute('href');
+    if (!href || href === '#' || href.startsWith('javascript:') || href.startsWith('http') || el.hasAttribute('data-bs-toggle') || el.hasAttribute('target')) return;
+    if (el.closest('.sidebar') || el.closest('.navbar') || el.closest('.pagination') || el.closest('.btn-group')) {
+      Modal3D.showLoading();
+    }
+  } catch (err) {
+    console.error('Nav loading error:', err);
+  }
+});
