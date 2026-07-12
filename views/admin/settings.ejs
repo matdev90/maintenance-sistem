@@ -1,9 +1,9 @@
 <div class="row">
   <div class="col-md-6 mb-3">
-    <div class="card">
+    <div class="card h-100">
       <div class="card-header"><h6 class="mb-0"><i class="bi bi-hospital"></i> Profil Rumah Sakit</h6></div>
-      <div class="card-body">
-        <form method="POST" action="/admin/settings" enctype="multipart/form-data" onsubmit="Modal3D.showLoading('Menyimpan pengaturan...')">
+      <div class="card-body d-flex flex-column">
+        <form method="POST" action="/admin/settings" enctype="multipart/form-data" onsubmit="Modal3D.showLoading('Menyimpan pengaturan...')" class="d-flex flex-column flex-grow-1">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <div class="mb-3">
             <label class="form-label">Nama Rumah Sakit <span class="text-danger">*</span></label>
@@ -35,10 +35,10 @@
   </div>
 
   <div class="col-md-6 mb-3">
-    <div class="card">
+    <div class="card h-100">
       <div class="card-header"><h6 class="mb-0"><i class="bi bi-telegram"></i> Notifikasi Telegram</h6></div>
-      <div class="card-body">
-        <form method="POST" action="/admin/settings/telegram" onsubmit="Modal3D.showLoading('Menyimpan pengaturan Telegram...')">
+      <div class="card-body d-flex flex-column">
+        <form method="POST" action="/admin/settings/telegram" onsubmit="Modal3D.showLoading('Menyimpan pengaturan Telegram...')" class="d-flex flex-column flex-grow-1">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <div class="mb-3">
             <label class="form-label">Bot Token <span class="text-danger">*</span></label>
@@ -118,11 +118,11 @@
       </div>
     </div>
 
-    <div class="card mt-3 border-success">
+    <div class="card mt-3 border-success h-100">
       <div class="card-header bg-success bg-opacity-10"><h6 class="mb-0"><i class="bi bi-key"></i> Cara Dapatkan Permanent Token (Gratis)</h6></div>
-      <div class="card-body small">
+      <div class="card-body small d-flex flex-column">
         <p class="mb-2"><strong>Token permanen tidak expired</strong> — cocok untuk produksi. Ikuti langkah ini:</p>
-        <ol class="mb-3">
+        <ol class="mb-3 flex-grow-1">
           <li>Buka <a href="https://business.facebook.com/settings/system-users" target="_blank" class="text-decoration-none"><strong>Meta Business Settings → System Users</strong></a></li>
           <li>Klik <strong>Add</strong> → Buat <em>System User</em> (role: Admin)</li>
           <li>Pilih System User tadi → <strong>Generate New Token</strong></li>
@@ -130,7 +130,7 @@
           <li>Copy token → Paste ke field <strong>API Key / Access Token</strong> di atas</li>
           <li>Phone Number ID: lihat di <strong>WhatsApp Accounts → Settings → Phone Numbers</strong></li>
         </ol>
-        <div class="alert alert-info py-2 mb-0">
+        <div class="alert alert-info py-2 mb-0 mt-auto">
           <i class="bi bi-info-circle"></i> <strong>Gratis:</strong> 1.000 percakapan/bln. Di atasnya ~$0.005–$0.09/percakapan (Indonesia).
         </div>
       </div>
@@ -170,13 +170,14 @@
       </div>
     </div>
 
-    <div class="card mt-3 border-info">
+    <div class="card mt-3 border-info h-100">
       <div class="card-header bg-info bg-opacity-10">
         <h6 class="mb-0"><i class="bi bi-question-circle"></i> Penjelasan SLA</h6>
       </div>
-      <div class="card-body small">
+      <div class="card-body small d-flex flex-column">
         <p><strong>SLA (Service Level Agreement)</strong> = target batas waktu penanganan laporan. Sistem mengecek setiap 5 menit apakah ada laporan yang melanggar SLA, lalu mengirim notifikasi ke admin.</p>
 
+        <div class="flex-grow-1">
         <h6 class="mt-3">Alur Laporan</h6>
         <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
           <span class="badge bg-secondary">dilaporkan</span>
@@ -221,8 +222,9 @@
           <li>Jam 14:00 belum investigasi → <span class="text-danger">SLA Violation</span></li>
           <li>Besok jam 10:00 belum selesai → <span class="text-danger">SLA Violation</span></li>
         </ul>
+        </div>
 
-        <h6 class="mt-3">Alur Tiket</h6>
+        <h6 class="mt-4 mt-auto">Alur Tiket</h6>
         <p class="mb-0">Tiket menggunakan mapping: <code>rendah→ringan</code>, <code>sedang→sedang</code>, <code>tinggi→berat</code>, <code>kritis→kritis</code>. Tahap hanya <strong>Validasi</strong> (open) dan <strong>Selesai</strong> (in_progress).</p>
       </div>
     </div>
