@@ -294,8 +294,13 @@ function setRating(val) {
   var socket = window.socket || io();
   var reportId = <%= report.id %>;
 
+  function matchEntity(data) {
+    var r = data.report || data;
+    return r && (r.id === reportId);
+  }
+
   socket.on('report_update_layanan', function(data) {
-    if (data.report && data.report.id === reportId) {
+    if (matchEntity(data)) {
       setTimeout(function() { location.reload(); }, 1000);
     }
   });

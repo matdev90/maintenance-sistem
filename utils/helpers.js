@@ -61,16 +61,35 @@ async function notifyAllTeknisi(title, message, link, excludeUserId) {
 
 async function emitDisplayUpdate(entityId, model, kategoriAlias) {
   try {
-    const entity = await model.findByPk(entityId, {
-      include: [{ model: DeviceCategory, as: kategoriAlias }]
-    });
-    const kategori = entity && (entity.kategori || entity.kategoriDevice);
+    const entity = await model.findByPk(entityId);
+    if (!entity) return;
+
+    const isTicket = model.name === 'Ticket';
+    const eventName = 'report_update_layanan';
+    const reportData = { id: entity.id, type: isTicket ? 'ticket' : 'report', status: entity.status };
+
+    emitToAll(eventName, { report: reportData });
+
+    const kategori = entity.kategori || entity.kategoriDevice;
+    if (!kategori) {
+      const dc = await DeviceCategory.findByPk(entity.id_kategori);
+      if (dc) {
+        const layanan = await Layanan.findByPk(dc.id_layanan);
+        if (layanan) {
+          emitToAll('report_update_layanan', {
+            kode_layanan: layanan.kode,
+            report: reportData
+          });
+        }
+      }
+      return;
+    }
     if (kategori) {
       const layanan = await Layanan.findByPk(kategori.id_layanan);
       if (layanan) {
         emitToAll('report_update_layanan', {
           kode_layanan: layanan.kode,
-          report: { id: entity.id, status: entity.status }
+          report: reportData
         });
       }
     }

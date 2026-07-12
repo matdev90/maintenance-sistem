@@ -267,11 +267,15 @@ function setRatingTicket(val) {
 (function() {
   var socket = window.socket || io();
   var ticketId = <%= ticket.id %>;
-  var lastUpdate = '<%= ticket.updated_at %>';
   var reloadTimer = null;
 
+  function matchEntity(data) {
+    var r = data.report || data;
+    return r && (r.id === ticketId);
+  }
+
   socket.on('report_update_layanan', function(data) {
-    if (data.report && (data.report.id === ticketId || data.id === ticketId)) {
+    if (matchEntity(data)) {
       if (reloadTimer) clearTimeout(reloadTimer);
       reloadTimer = setTimeout(function() { location.reload(); }, 1000);
     }
