@@ -1,0 +1,123 @@
+<style>
+  .log-action { font-size: .7rem; font-weight: 600; letter-spacing: .3px; }
+  .log-detail pre { font-size: .7rem; max-height: 60px; overflow: hidden; margin: 0; }
+  .log-detail pre:hover { max-height: none; }
+</style>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="GET" action="/admin/logs" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label">Aksi</label>
+        <select name="action" class="form-select form-select-sm">
+          <option value="">Semua Aksi</option>
+          <option value="login" <%= filters.action === 'login' ? 'selected' : '' %>>Login</option>
+          <option value="logout" <%= filters.action === 'logout' ? 'selected' : '' %>>Logout</option>
+          <option value="login_failed" <%= filters.action === 'login_failed' ? 'selected' : '' %>>Login Gagal</option>
+          <option value="create" <%= filters.action === 'create' ? 'selected' : '' %>>Create</option>
+          <option value="update" <%= filters.action === 'update' ? 'selected' : '' %>>Update</option>
+          <option value="delete" <%= filters.action === 'delete' ? 'selected' : '' %>>Delete</option>
+          <option value="store" <%= filters.action === 'store' ? 'selected' : '' %>>Store</option>
+          <option value="validasi" <%= filters.action === 'validasi' ? 'selected' : '' %>>Validasi</option>
+          <option value="investigasi" <%= filters.action === 'investigasi' ? 'selected' : '' %>>Investigasi</option>
+          <option value="ambil_tugas" <%= filters.action === 'ambil_tugas' ? 'selected' : '' %>>Ambil Tugas</option>
+          <option value="selesai" <%= filters.action === 'selesai' ? 'selected' : '' %>>Selesai</option>
+          <option value="rating" <%= filters.action === 'rating' ? 'selected' : '' %>>Rating</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Tipe Entitas</label>
+        <select name="entity_type" class="form-select form-select-sm">
+          <option value="">Semua Tipe</option>
+          <option value="auth" <%= filters.entity_type === 'auth' ? 'selected' : '' %>>Auth</option>
+          <option value="report" <%= filters.entity_type === 'report' ? 'selected' : '' %>>Report</option>
+          <option value="ticket" <%= filters.entity_type === 'ticket' ? 'selected' : '' %>>Ticket</option>
+          <option value="user" <%= filters.entity_type === 'user' ? 'selected' : '' %>>User</option>
+          <option value="asset" <%= filters.entity_type === 'asset' ? 'selected' : '' %>>Asset</option>
+          <option value="setting" <%= filters.entity_type === 'setting' ? 'selected' : '' %>>Setting</option>
+          <option value="layanan" <%= filters.entity_type === 'layanan' ? 'selected' : '' %>>Layanan</option>
+          <option value="category" <%= filters.entity_type === 'category' ? 'selected' : '' %>>Category</option>
+          <option value="shift" <%= filters.entity_type === 'shift' ? 'selected' : '' %>>Shift</option>
+          <option value="preventive_maintenance" <%= filters.entity_type === 'preventive_maintenance' ? 'selected' : '' %>>PM</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" class="form-control form-control-sm" value="<%= filters.username || '' %>" placeholder="Cari username...">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Dari</label>
+        <input type="date" name="dari" class="form-control form-control-sm" value="<%= filters.dari || '' %>">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Sampai</label>
+        <input type="date" name="sampai" class="form-control form-control-sm" value="<%= filters.sampai || '' %>">
+      </div>
+      <div class="col-md-1">
+        <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-search"></i></button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-journal-text me-1"></i> Log Aktivitas</span>
+    <small class="text-muted"><%= pagination.total %> entri</small>
+  </div>
+  <div class="card-body p-0">
+    <% if (logs.length === 0) { %>
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-journal-text" style="font-size: 2rem;"></i>
+      <p class="mt-2">Belum ada log aktivitas</p>
+    </div>
+    <% } else { %>
+    <div class="table-responsive">
+      <table class="table table-sm table-hover mb-0">
+        <thead>
+          <tr>
+            <th width="50">No</th>
+            <th width="120">Waktu</th>
+            <th width="120">User</th>
+            <th width="90">Aksi</th>
+            <th width="90">Tipe</th>
+            <th width="50">ID</th>
+            <th>Detail</th>
+            <th width="130">IP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% logs.forEach(function(l, i) { var no = (pagination.currentPage - 1) * pagination.limit + i + 1; %>
+          <tr>
+            <td><a href="/admin/logs/<%= l.id %>"><%= no %></a></td>
+            <td><small><%= fmtDate(l.created_at) %></small></td>
+            <td><small><%= l.username || '-' %></small></td>
+            <td>
+              <% var badges = { login: 'info', logout: 'secondary', login_failed: 'danger', create: 'success', store: 'success', update: 'primary', delete: 'danger', validasi: 'success', investigasi: 'info', ambil_tugas: 'warning', selesai: 'success', rating: 'warning' } %>
+              <span class="badge bg-<%= badges[l.action] || 'secondary' %> log-action"><%= l.action %></span>
+            </td>
+            <td><small class="text-muted"><%= l.entity_type || '-' %></small></td>
+            <td><small><%= l.entity_id || '-' %></small></td>
+            <td class="log-detail"><pre><%= l.detail ? JSON.stringify(JSON.parse(l.detail), null, 1) : '-' %></pre></td>
+            <td><small class="text-muted"><%= l.ip_address || '-' %></small></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<% if (pagination.totalPages > 1) { %>
+<nav class="mt-3">
+  <ul class="pagination pagination-sm justify-content-center">
+    <% var qs = ''; ['action','entity_type','username','dari','sampai','q'].forEach(function(k) { if (filters[k]) qs += '&' + k + '=' + encodeURIComponent(filters[k]); }) %>
+    <% for (var p = 1; p <= pagination.totalPages; p++) { %>
+    <li class="page-item <%= p === pagination.currentPage ? 'active' : '' %>">
+      <a class="page-link" href="?page=<%= p %><%= qs %>"><%= p %></a>
+    </li>
+    <% } %>
+  </ul>
+</nav>
+<% } %>

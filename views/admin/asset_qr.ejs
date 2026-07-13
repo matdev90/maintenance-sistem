@@ -1,0 +1,50 @@
+<div class="row">
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-qr-code"></i> QR Code - <%= asset.kode_asset %></h6></div>
+      <div class="card-body text-center">
+        <% if (asset.qr_code) { %>
+        <img src="<%= asset.qr_code %>" alt="QR Code <%= asset.kode_asset %>" class="img-fluid border rounded" style="max-width:300px;">
+        <% } else { %>
+        <p class="text-muted">QR Code belum tersedia</p>
+        <% } %>
+        <hr>
+        <h6><%= asset.nama_perangkat %></h6>
+        <p class="text-muted mb-1"><%= asset.kode_asset %></p>
+        <p class="text-muted mb-1"><%= asset.unit ? asset.unit.nama_unit : '-' %> | <%= asset.kategori ? asset.kategori.nama_kategori : '-' %></p>
+        <p class="text-muted"><%= asset.merk || '' %> <%= asset.model || '' %></p>
+        <button onclick="window.print()" class="btn btn-primary btn-3d mt-2"><i class="bi bi-printer"></i> Cetak QR Code</button>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-info-circle"></i> Detail Aset</h6></div>
+      <div class="card-body">
+        <table class="table table-sm">
+          <tr><th>Kode Aset</th><td><%= asset.kode_asset %></td></tr>
+          <tr><th>Nama</th><td><%= asset.nama_perangkat %></td></tr>
+          <tr><th>Kategori</th><td><%= asset.kategori ? asset.kategori.nama_kategori : '-' %></td></tr>
+          <tr><th>Unit</th><td><%= asset.unit ? asset.unit.nama_unit : '-' %></td></tr>
+          <tr><th>Lokasi</th><td><%= asset.lokasi_detail || '-' %></td></tr>
+          <tr><th>Merk</th><td><%= asset.merk || '-' %></td></tr>
+          <tr><th>Model</th><td><%= asset.model || '-' %></td></tr>
+          <tr><th>Serial Number</th><td><%= asset.serial_number || '-' %></td></tr>
+          <tr><th>Tahun</th><td><%= asset.tahun_pembelian || '-' %></td></tr>
+          <tr><th>Kondisi</th><td><span class="badge <%= {baik:'bg-success', rusak_ringan:'bg-warning', rusak_berat:'bg-danger', tidak_aktif:'bg-secondary'}[asset.kondisi] %>"><%= asset.kondisi.replace(/_/g, ' ') %></span></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<a href="/admin/assets" class="btn btn-sm btn-secondary btn-3d mt-3"><i class="bi bi-arrow-left"></i> Kembali ke Daftar Aset</a>
+
+<style>
+  @media print {
+    .sidebar, .navbar-main, .content-header, .btn, nav, .card-header { display: none !important; }
+    .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+    main { padding-top: 0 !important; margin: 0 !important; padding: 10px !important; }
+    .col-md-6 { max-width: 50% !important; }
+  }
+</style>

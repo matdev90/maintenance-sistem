@@ -1,0 +1,13 @@
+<% if (pagination && pagination.totalPages > 1) { %>
+<nav class="mt-3">
+  <ul class="pagination pagination-sm justify-content-center">
+    <% var qs = ''; if (typeof filters !== 'undefined' && filters) { Object.keys(filters).forEach(function(k) { if (filters[k]) qs += '&' + k + '=' + encodeURIComponent(filters[k]); }); } %>
+    <% var base = typeof baseUrl !== 'undefined' ? baseUrl : ''; %>
+    <% for (var p = 1; p <= pagination.totalPages; p++) { %>
+    <li class="page-item <%= p === pagination.currentPage ? 'active' : '' %>">
+      <a class="page-link" href="<%= base %>?page=<%= p %><%= qs %>"><%= p %></a>
+    </li>
+    <% } %>
+  </ul>
+</nav>
+<% } %>

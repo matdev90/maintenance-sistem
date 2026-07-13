@@ -1,0 +1,100 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <a href="/admin/assets/create" class="btn btn-primary btn-3d"><i class="bi bi-plus-lg"></i> Tambah Aset</a>
+    <a href="/admin/assets/scan" class="btn btn-outline-success btn-3d"><i class="bi bi-qr-code-scan"></i> Scan QR</a>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="GET" action="/admin/assets" class="auto-filter row g-2">
+      <div class="col-md-2">
+        <select name="unit" class="form-select form-select-sm">
+          <option value="">Semua Unit</option>
+          <% units.forEach(function(u) { %>
+          <option value="<%= u.id %>" <%= filters.unit == u.id ? 'selected' : '' %>><%= u.nama_unit %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="kategori" class="form-select form-select-sm">
+          <option value="">Semua Kategori</option>
+          <% categories.forEach(function(c) { %>
+          <option value="<%= c.id %>" <%= filters.kategori == c.id ? 'selected' : '' %>><%= c.nama_kategori %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="kondisi" class="form-select form-select-sm">
+          <option value="">Semua Kondisi</option>
+          <option value="baik" <%= filters.kondisi === 'baik' ? 'selected' : '' %>>Baik</option>
+          <option value="rusak_ringan" <%= filters.kondisi === 'rusak_ringan' ? 'selected' : '' %>>Rusak Ringan</option>
+          <option value="rusak_berat" <%= filters.kondisi === 'rusak_berat' ? 'selected' : '' %>>Rusak Berat</option>
+          <option value="tidak_aktif" <%= filters.kondisi === 'tidak_aktif' ? 'selected' : '' %>>Tidak Aktif</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <input type="text" name="q" class="form-control form-control-sm" placeholder="Cari kode/nama/merk..." value="<%= filters.q || '' %>">
+      </div>
+      <div class="col-md-3 d-flex gap-2">
+        <button type="submit" class="btn btn-sm btn-primary btn-3d"><i class="bi bi-search"></i> Cari</button>
+        <a href="/admin/assets" class="btn btn-sm btn-outline-secondary btn-3d">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0 table-datatable">
+      <thead>
+        <tr>
+          <th width="40">No</th>
+          <th>Kode</th>
+          <th>Nama Perangkat</th>
+          <th>Kategori</th>
+          <th>Unit</th>
+          <th>Merk/Model</th>
+          <th>Kondisi</th>
+          <th width="120">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (assets.length) { assets.forEach(function(a, i) { %>
+        <tr>
+          <td><%= (pagination.currentPage - 1) * pagination.limit + i + 1 %></td>
+          <td><code><%= a.kode_asset %></code></td>
+          <td><%= a.nama_perangkat %></td>
+          <td><%= a.kategori ? a.kategori.nama_kategori : '-' %></td>
+          <td><%= a.unit ? a.unit.nama_unit : '-' %></td>
+          <td><%= a.merk || '-' %> <%= a.model || '' %></td>
+          <td>
+            <% var kClass = {baik:'bg-success', rusak_ringan:'bg-warning', rusak_berat:'bg-danger', tidak_aktif:'bg-secondary'}[a.kondisi] || 'bg-secondary'; %>
+            <span class="badge <%= kClass %>"><%= a.kondisi.replace(/_/g, ' ') %></span>
+          </td>
+          <td>
+            <a href="/admin/assets/<%= a.id %>/qr" class="btn btn-sm btn-outline-success btn-3d" title="QR Code"><i class="bi bi-qr-code"></i></a>
+            <a href="/admin/assets/edit/<%= a.id %>" class="btn btn-sm btn-outline-primary btn-3d" title="Edit"><i class="bi bi-pencil"></i></a>
+            <form method="POST" action="/admin/assets/delete/<%= a.id %>" class="d-inline" onsubmit="return confirm('Hapus aset ini?')">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-sm btn-outline-danger btn-3d" title="Hapus"><i class="bi bi-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+        <% }); } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if (pagination.totalPages > 1) { %>
+<nav class="mt-3">
+  <ul class="pagination pagination-sm justify-content-center">
+    <% for (var p = 1; p <= pagination.totalPages; p++) { %>
+    <li class="page-item <%= p === pagination.currentPage ? 'active' : '' %>">
+      <a class="page-link" href="?page=<%= p %>&unit=<%= filters.unit || '' %>&kategori=<%= filters.kategori || '' %>&kondisi=<%= filters.kondisi || '' %>&q=<%= filters.q || '' %>"><%= p %></a>
+    </li>
+    <% } %>
+  </ul>
+</nav>
+<% } %>

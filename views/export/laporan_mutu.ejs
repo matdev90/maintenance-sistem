@@ -1,0 +1,179 @@
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form id="filterForm" class="auto-filter row g-2 align-items-end">
+      <div class="col-md-2">
+        <label class="form-label small">Unit</label>
+        <select name="unit" class="form-select form-select-sm filter-input">
+          <option value="">Semua Unit</option>
+          <% units.forEach(function(u) { %>
+          <option value="<%= u.id %>" <%= filters.unit == u.id ? 'selected' : '' %>><%= u.nama_unit %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Prioritas</label>
+        <select name="prioritas" class="form-select form-select-sm filter-input">
+          <option value="">Semua</option>
+          <option value="rendah" <%= filters.prioritas === 'rendah' ? 'selected' : '' %>>Rendah</option>
+          <option value="ringan" <%= filters.prioritas === 'ringan' ? 'selected' : '' %>>Ringan</option>
+          <option value="sedang" <%= filters.prioritas === 'sedang' ? 'selected' : '' %>>Sedang</option>
+          <option value="tinggi" <%= filters.prioritas === 'tinggi' ? 'selected' : '' %>>Tinggi</option>
+          <option value="berat" <%= filters.prioritas === 'berat' ? 'selected' : '' %>>Berat</option>
+          <option value="kritis" <%= filters.prioritas === 'kritis' ? 'selected' : '' %>>Kritis</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Status</label>
+        <select name="status" class="form-select form-select-sm filter-input">
+          <option value="">Semua (Selesai Default)</option>
+          <option value="open" <%= filters.status === 'open' ? 'selected' : '' %>>Terbuka</option>
+          <option value="in_progress" <%= filters.status === 'in_progress' ? 'selected' : '' %>>Dalam Pengerjaan</option>
+          <option value="resolved" <%= filters.status === 'resolved' ? 'selected' : '' %>>Terselesaikan</option>
+          <option value="closed" <%= filters.status === 'closed' ? 'selected' : '' %>>Ditutup</option>
+          <option value="reopened" <%= filters.status === 'reopened' ? 'selected' : '' %>>Dibuka Ulang</option>
+          <option value="selesai" <%= filters.status === 'selesai' ? 'selected' : '' %>>Selesai (Laporan)</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Dari</label>
+        <input type="date" name="dari" id="filterDari" class="form-control form-control-sm filter-input" value="<%= filters.dari || '' %>">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Sampai</label>
+        <input type="date" name="sampai" id="filterSampai" class="form-control form-control-sm filter-input" value="<%= filters.sampai || '' %>">
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h6 class="mb-0"><i class="bi bi-table"></i> Data Laporan Mutu</h6>
+    <div>
+      <% if (!filters.status || filters.status === '') { %>
+      <span class="badge bg-success me-2"><i class="bi bi-check-circle"></i> Filter Default: Hanya Status Selesai</span>
+      <% } %>
+      <a href="/export/export-pdf?<%= querystring.stringify(filters) %>" class="btn btn-sm btn-danger" target="_blank" id="btnExportPdf" onclick="return validateExport()">
+        <i class="bi bi-file-pdf"></i> PDF
+      </a>
+      <a href="/export/export-excel?<%= querystring.stringify(filters) %>" class="btn btn-sm btn-success" id="btnExportExcel" onclick="return validateExport()">
+        <i class="bi bi-file-excel"></i> Excel
+      </a>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-hover mb-0">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Tipe</th>
+            <th>No. Tiket/Lap</th>
+            <th>Unit</th>
+            <th>Perangkat</th>
+            <th>Prioritas</th>
+            <th>Status</th>
+            <th>Pelapor</th>
+            <th>Teknisi</th>
+            <th>Tgl Lapor</th>
+            <th>Tgl Diambil</th>
+            <th>Response (jam)</th>
+            <th>Tgl Selesai</th>
+            <th>Total (jam)</th>
+            <th>SLA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (data.length === 0) { %>
+          <tr><td colspan="15" class="text-center text-muted py-4">Tidak ada data</td></tr>
+          <% } %>
+          <% data.forEach(function(d, i) { %>
+          <tr>
+            <td><%= i + 1 %></td>
+            <td><span class="badge <%= d.tipe === 'Tiket' ? 'bg-primary' : 'bg-secondary' %>"><%= d.tipe %></span></td>
+            <td><%= d.no %></td>
+            <td><%= d.unit %></td>
+            <td><%= d.perangkat %></td>
+            <td><span class="badge <%= {ringan:'bg-success', sedang:'bg-warning', berat:'bg-danger', kritis:'bg-dark', rendah:'bg-success', tinggi:'bg-danger'}[d.prioritas] || 'bg-warning' %>"><%= d.prioritas %></span></td>
+            <td><span class="badge bg-secondary"><%= {open:'Terbuka', in_progress:'Dalam Pengerjaan', resolved:'Terselesaikan', closed:'Ditutup', reopened:'Dibuka Ulang'}[d.status] || d.status.replace(/_/g,' ') %></span></td>
+            <td><%= d.pelapor %></td>
+            <td><%= d.teknisi || '-' %></td>
+            <td><%= fmtDate(d.tgl_lapor) %></td>
+            <td><%= fmtDate(d.tgl_ambil) %></td>
+            <td><strong><%= d.responseTime || '-' %></strong></td>
+            <td><%= fmtDate(d.tgl_selesai) %></td>
+            <td><strong><%= d.totalTime || '-' %></strong></td>
+            <td>
+              <% if (d.slaStatus === 'violation') { %>
+                <span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Violation</span>
+              <% } else if (d.slaStatus === 'ok' || (d.respHours !== null && d.slaTarget)) { %>
+                <span class="text-success"><i class="bi bi-check-circle-fill"></i> OK</span>
+              <% } else { %>
+                <span class="text-muted">-</span>
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <%- include('../partials/pagination', { pagination, filters: filters }) %>
+  </div>
+</div>
+
+<script>
+(function() {
+  var dari = document.getElementById('filterDari');
+  var sampai = document.getElementById('filterSampai');
+  if (dari && sampai && !dari.value && !sampai.value) {
+    var now = new Date();
+    var yyyy = now.getFullYear();
+    var mm = String(now.getMonth() + 1).padStart(2, '0');
+    var dd = String(now.getDate()).padStart(2, '0');
+    var today = yyyy + '-' + mm + '-' + dd;
+    dari.value = today;
+    sampai.value = today;
+    document.getElementById('filterForm').submit();
+  }
+})();
+
+function buildExportUrl(base) {
+  var params = new URLSearchParams();
+  var dari = document.getElementById('filterDari').value;
+  var sampai = document.getElementById('filterSampai').value;
+  var unit = document.querySelector('[name="unit"]').value;
+  var prioritas = document.querySelector('[name="prioritas"]').value;
+  var status = document.querySelector('[name="status"]').value;
+  if (unit) params.set('unit', unit);
+  if (prioritas) params.set('prioritas', prioritas);
+  if (status) params.set('status', status);
+  if (dari) params.set('dari', dari);
+  if (sampai) params.set('sampai', sampai);
+  return base + '?' + params.toString();
+}
+
+function validateExport() {
+  var dari = document.getElementById('filterDari').value;
+  var sampai = document.getElementById('filterSampai').value;
+  if (!dari || !sampai) {
+    alert('Filter tanggal "Dari" dan "Sampai" harus diisi sebelum export.');
+    return false;
+  }
+  return true;
+}
+
+function updateExportLinks() {
+  var pdfBtn = document.getElementById('btnExportPdf');
+  var excelBtn = document.getElementById('btnExportExcel');
+  if (pdfBtn) pdfBtn.href = buildExportUrl('/export/export-pdf');
+  if (excelBtn) excelBtn.href = buildExportUrl('/export/export-excel');
+}
+
+document.getElementById('filterDari').addEventListener('change', updateExportLinks);
+document.getElementById('filterSampai').addEventListener('change', updateExportLinks);
+document.querySelectorAll('.filter-input').forEach(function(el) {
+  el.addEventListener('change', updateExportLinks);
+});
+</script>
+
+

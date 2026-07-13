@@ -1,0 +1,152 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <a href="/reports/create" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Buat Laporan
+    </a>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form id="filterForm" class="auto-filter row g-2 align-items-end">
+      <div class="col-md-2">
+        <label class="form-label small">Pencarian</label>
+        <input type="text" name="q" class="form-control form-control-sm filter-input" placeholder="Nama perangkat..." value="<%= filters.q || '' %>">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Unit</label>
+        <select name="unit" class="form-select form-select-sm filter-input">
+          <option value="">Semua Unit</option>
+          <% units.forEach(function(u) { %>
+          <option value="<%= u.id %>" <%= filters.unit == u.id ? 'selected' : '' %>><%= u.nama_unit %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Prioritas</label>
+        <select name="prioritas" class="form-select form-select-sm filter-input">
+          <option value="">Semua</option>
+          <option value="ringan" <%= filters.prioritas === 'ringan' ? 'selected' : '' %>>Ringan</option>
+          <option value="sedang" <%= filters.prioritas === 'sedang' ? 'selected' : '' %>>Sedang</option>
+          <option value="berat" <%= filters.prioritas === 'berat' ? 'selected' : '' %>>Berat</option>
+          <option value="kritis" <%= filters.prioritas === 'kritis' ? 'selected' : '' %>>Kritis</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Status</label>
+        <select name="status" class="form-select form-select-sm filter-input">
+          <option value="">Semua</option>
+          <option value="dilaporkan" <%= filters.status === 'dilaporkan' ? 'selected' : '' %>>Dilaporkan</option>
+          <option value="divalidasi" <%= filters.status === 'divalidasi' ? 'selected' : '' %>>Divalidasi</option>
+          <option value="investigasi" <%= filters.status === 'investigasi' ? 'selected' : '' %>>Investigasi</option>
+          <option value="dalam_perbaikan" <%= filters.status === 'dalam_perbaikan' ? 'selected' : '' %>>Dalam Perbaikan</option>
+          <option value="selesai" <%= filters.status === 'selesai' ? 'selected' : '' %>>Selesai</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Dari</label>
+        <input type="date" name="dari" id="filterDari" class="form-control form-control-sm filter-input" value="<%= filters.dari || '' %>">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Sampai</label>
+        <input type="date" name="sampai" id="filterSampai" class="form-control form-control-sm filter-input" value="<%= filters.sampai || '' %>">
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th style="width:50px">No.</th>
+            <th>Unit</th>
+            <th>Kategori</th>
+            <th>Perangkat</th>
+            <th>Prioritas</th>
+            <th>Status</th>
+            <th>Pelapor</th>
+            <th>Teknisi</th>
+            <th>Tanggal</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (reports.length === 0) { %>
+          <tr><td colspan="10" class="text-center text-muted py-4">Tidak ada data</td></tr>
+          <% } %>
+          <% reports.forEach(function(r, i) { %>
+          <tr>
+            <td><%= ((pagination.currentPage || 1) - 1) * (pagination.limit || 15) + i + 1 %></td>
+            <td><%= r.unit ? r.unit.nama_unit : '-' %></td>
+            <td><%= r.kategori ? r.kategori.nama_kategori : '-' %></td>
+            <td><%= r.nama_perangkat %></td>
+            <td>
+              <% var pc = {ringan:'bg-success', sedang:'bg-warning', berat:'bg-danger', kritis:'bg-dark'} %>
+              <span class="badge <%= pc[r.prioritas] || 'bg-secondary' %>"><%= r.prioritas %></span>
+            </td>
+            <td>
+              <% var sc = {dilaporkan:'bg-secondary', divalidasi:'bg-info', investigasi:'bg-primary', dalam_perbaikan:'bg-warning', selesai:'bg-success', tidak_valid:'bg-danger', tidak_dapat_diperbaiki:'bg-danger'} %>
+              <span class="badge <%= sc[r.status] || 'bg-secondary' %>"><%= r.status.replace(/_/g,' ') %></span>
+            </td>
+            <td><%= r.pelapor ? r.pelapor.nama_lengkap : '-' %></td>
+            <td><% if (r.teknisi) { %><%= r.teknisi.nama_lengkap %><% } else { %><span class="text-muted">-</span><% } %></td>
+            <td><%= fmtDate(r.created_at) %></td>
+            <td>
+              <% var canEdit = r.status === 'dilaporkan'; %>
+              <% var canDelete = r.status === 'dilaporkan'; %>
+              <a href="/reports/<%= r.id %>" class="btn btn-sm btn-info" title="Detail">
+                <i class="bi bi-eye"></i>
+              </a>
+              <% if (canEdit) { %>
+              <a href="/reports/<%= r.id %>/edit" class="btn btn-sm btn-warning" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <% } else { %>
+              <button class="btn btn-sm btn-warning disabled" title="Edit hanya bisa saat status Dilaporkan" disabled>
+                <i class="bi bi-pencil"></i>
+              </button>
+              <% } %>
+              <% if (canDelete) { %>
+              <form method="POST" action="/reports/<%= r.id %>/delete" class="d-inline" id="delete-form-<%= r.id %>">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button type="button" class="btn btn-sm btn-danger" title="Hapus"
+                  onclick="Modal3D.showConfirm({icon:'bi bi-exclamation-triangle',title:'Hapus Laporan',message:'Hapus laporan <strong>#<%= r.id %> - <%= r.nama_perangkat %></strong>?<br><small class=\\'text-muted\\'>Data yang dihapus tidak dapat dikembalikan.</small>',confirmText:'Ya, Hapus',cancelText:'Batal',type:'danger',onConfirm:function(){Modal3D.showLoading('Menghapus...');document.getElementById('delete-form-<%= r.id %>').submit();}})">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+              <% } else { %>
+              <button class="btn btn-sm btn-danger disabled" title="Hapus hanya bisa saat status Dilaporkan" disabled>
+                <i class="bi bi-trash"></i>
+              </button>
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <%- include('../partials/pagination', { pagination, filters }) %>
+  </div>
+</div>
+
+<script>
+(function() {
+  var dari = document.getElementById('filterDari');
+  var sampai = document.getElementById('filterSampai');
+  if (dari && sampai && !dari.value && !sampai.value) {
+    var now = new Date();
+    var yyyy = now.getFullYear();
+    var mm = String(now.getMonth() + 1).padStart(2, '0');
+    var dd = String(now.getDate()).padStart(2, '0');
+    var today = yyyy + '-' + mm + '-' + dd;
+    dari.value = today;
+    sampai.value = today;
+    document.getElementById('filterForm').submit();
+  }
+})();
+</script>
+
+

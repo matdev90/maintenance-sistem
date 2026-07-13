@@ -1,0 +1,60 @@
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-shield-lock"></i> Pengaturan 2FA (Two-Factor Authentication)</h6></div>
+      <div class="card-body">
+        <% if (twoFactorEnabled) { %>
+          <div class="alert alert-success">
+            <i class="bi bi-check-circle me-2"></i> <strong>2FA Aktif</strong>
+            <p class="mb-0 mt-2">Autentikasi dua faktor sudah aktif untuk akun ini.</p>
+          </div>
+          <hr>
+          <h6>Nonaktifkan 2FA</h6>
+          <p class="text-muted small">Masukkan kode OTP dari aplikasi authenticator Anda untuk menonaktifkan 2FA.</p>
+          <form method="POST" action="/admin/2fa/disable">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="mb-3">
+              <label class="form-label">Kode OTP</label>
+              <input type="text" name="token" class="form-control" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required autofocus>
+            </div>
+            <button type="submit" class="btn btn-danger btn-3d"><i class="bi bi-x-circle"></i> Nonaktifkan 2FA</button>
+          </form>
+        <% } else { %>
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i> <strong>2FA Belum Aktif</strong>
+            <p class="mb-0 mt-2">Aktifkan 2FA untuk keamanan tambahan pada akun admin Anda.</p>
+          </div>
+          
+          <h6>Langkah 1: Scan QR Code</h6>
+          <p class="text-muted small">Aplikasi authenticator yang didukung: Google Authenticator, Authy, Microsoft Authenticator, dll.</p>
+          
+          <div class="text-center mb-4">
+            <% if (qrDataUri) { %>
+              <img src="<%= qrDataUri %>" alt="QR Code 2FA" class="img-fluid border rounded p-2" style="max-width:250px;">
+            <% } %>
+          </div>
+
+          <h6>Langkah 2: Atau masukkan manual</h6>
+          <div class="input-group mb-3">
+            <span class="input-group-text"><i class="bi bi-key"></i></span>
+            <input type="text" class="form-control font-monospace" value="<%= secret %>" readonly id="secretKey">
+            <button class="btn btn-outline-secondary" onclick="navigator.clipboard.writeText(document.getElementById('secretKey').value);this.innerHTML='<i class=\'bi bi-check\'></i> Tersalin';setTimeout(()=>this.innerHTML='<i class=\'bi bi-clipboard\'></i> Salin',1500)"><i class="bi bi-clipboard"></i> Salin</button>
+          </div>
+
+          <hr>
+          <h6>Langkah 3: Verifikasi</h6>
+          <p class="text-muted small">Masukkan kode 6 digit dari aplikasi authenticator Anda untuk mengaktifkan 2FA.</p>
+          <form method="POST" action="/admin/2fa/enable">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="mb-3">
+              <label class="form-label">Kode OTP</label>
+              <input type="text" name="token" class="form-control" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required autofocus>
+            </div>
+            <button type="submit" class="btn btn-success btn-3d"><i class="bi bi-shield-check"></i> Aktifkan 2FA</button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+    <a href="/admin/settings" class="btn btn-sm btn-secondary btn-3d mt-3"><i class="bi bi-arrow-left"></i> Kembali ke Pengaturan</a>
+  </div>
+</div>

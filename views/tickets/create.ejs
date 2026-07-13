@@ -1,0 +1,97 @@
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-ticket"></i> Buat Laporan Tiket Baru</h6></div>
+      <div class="card-body">
+        <form method="POST" action="/tickets/store" enctype="multipart/form-data" onsubmit="Modal3D.showLoading('Menyimpan tiket...')">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="hidden" name="sumber" value="web">
+          <div class="mb-3">
+            <label class="form-label">Nama Perangkat <span class="text-danger">*</span></label>
+            <input type="text" name="subjek" class="form-control" maxlength="200" required placeholder="Contoh: Printer Epson L3110 Ruang Bedah">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Deskripsi Kerusakan <span class="text-danger">*</span></label>
+            <textarea name="deskripsi" class="form-control" rows="4" required placeholder="Jelaskan kerusakan secara detail..."></textarea>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Unit / Ruangan</label>
+              <input type="text" class="form-control" value="<%= userUnit %>" readonly>
+              <input type="hidden" name="id_unit" value="<%= user.id_unit %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Layanan <span class="text-danger">*</span></label>
+              <select id="selectLayanan" class="form-select" required>
+                <option value="">Pilih Layanan</option>
+                <% layanans.forEach(function(l) { %>
+                <option value="<%= l.id %>"><%= l.nama_layanan %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Kategori <span class="text-danger">*</span></label>
+              <select id="selectKategori" name="id_kategori" class="form-select" required>
+                <option value="">Pilih Kategori</option>
+              </select>
+              <input type="hidden" name="kategori" id="hiddenKategori" value="lainnya">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Prioritas</label>
+              <select name="prioritas" class="form-select">
+                <option value="rendah">Rendah</option>
+                <option value="sedang" selected>Sedang</option>
+                <option value="tinggi">Tinggi</option>
+                <option value="kritis">Kritis</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Foto Bukti (opsional)</label>
+              <input type="file" name="foto" class="form-control" accept="image/jpeg,jpg,png,gif,webp">
+              <small class="text-muted">Maks. 2MB</small>
+            </div>
+          </div>
+          <% if (isTeknisi) { %>
+          <div class="mb-3 form-check">
+            <input type="checkbox" name="auto_assign" class="form-check-input" id="autoAssign" value="on">
+            <label class="form-check-label" for="autoAssign">
+              <i class="bi bi-person-check"></i> <strong>Saya yang akan menangani tiket ini</strong> (langsung assign ke saya, status: Dalam Pengerjaan)
+            </label>
+            <div class="form-text">Tiket tidak akan masuk antrian notifikasi teknisi lain. Anda menjadi teknisi utama.</div>
+          </div>
+          <% } %>
+          <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-send"></i> Kirim Laporan</button>
+          <a href="/tickets" class="btn btn-secondary btn-3d"><i class="bi bi-arrow-left"></i> Kembali</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var allKategoris = <%- JSON.stringify(allKategoris) %>;
+var selectLayanan = document.getElementById('selectLayanan');
+var selectKategori = document.getElementById('selectKategori');
+var hiddenKategori = document.getElementById('hiddenKategori');
+
+selectLayanan.addEventListener('change', function() {
+  var layananId = parseInt(this.value);
+  selectKategori.innerHTML = '<option value="">Pilih Kategori</option>';
+  if (!layananId) return;
+  allKategoris.forEach(function(k) {
+    if (k.id_layanan === layananId) {
+      var opt = document.createElement('option');
+      opt.value = k.id;
+      opt.textContent = k.nama_kategori;
+      selectKategori.appendChild(opt);
+    }
+  });
+});
+
+selectKategori.addEventListener('change', function() {
+  var selected = this.options[this.selectedIndex];
+  hiddenKategori.value = selected ? selected.textContent.toLowerCase().replace(/[^a-z]/g, '') : 'lainnya';
+});
+</script>

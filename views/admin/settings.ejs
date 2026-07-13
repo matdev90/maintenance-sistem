@@ -1,0 +1,316 @@
+<div class="row">
+  <div class="col-md-6 mb-3">
+    <div class="card h-100">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-hospital"></i> Profil Rumah Sakit</h6></div>
+      <div class="card-body d-flex flex-column">
+        <form method="POST" action="/admin/settings" enctype="multipart/form-data" onsubmit="Modal3D.showLoading('Menyimpan pengaturan...')" class="d-flex flex-column flex-grow-1">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label">Nama Rumah Sakit <span class="text-danger">*</span></label>
+            <input type="text" name="nama_rs" class="form-control" value="<%= settings.nama_rs || '' %>" maxlength="100" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Alamat</label>
+            <textarea name="alamat_rs" class="form-control" rows="2" maxlength="255"><%= settings.alamat_rs || '' %></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Telepon</label>
+            <input type="text" name="telepon_rs" class="form-control" value="<%= settings.telepon_rs || '' %>" maxlength="20" placeholder="Contoh: (021) 12345678">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Logo</label>
+            <input type="file" name="logo_rs" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp">
+            <div class="form-text">Format: JPG, PNG, GIF, WebP. Maks 2MB.</div>
+            <% if (settings.logo_rs) { %>
+              <div class="mt-2">
+                <img src="/uploads/<%= settings.logo_rs %>" style="max-height:60px" class="border rounded p-1">
+                <small class="text-muted ms-2">Logo saat ini</small>
+              </div>
+            <% } %>
+          </div>
+          <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-save"></i> Simpan</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 mb-3">
+    <div class="card h-100">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-telegram"></i> Notifikasi Telegram</h6></div>
+      <div class="card-body d-flex flex-column">
+        <form method="POST" action="/admin/settings/telegram" onsubmit="Modal3D.showLoading('Menyimpan pengaturan Telegram...')" class="d-flex flex-column flex-grow-1">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label">Bot Token <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <input type="password" id="tgToken" name="telegram_bot_token" class="form-control font-monospace" value="<%= settings.telegram_bot_token || '' %>" placeholder="1234567890:ABCdefGHIjklMNOpqrSTUvwxYZ" required>
+              <button class="btn btn-outline-secondary" type="button" onclick="toggleTgToken()"><i class="bi bi-eye" id="tgTokenIcon"></i></button>
+            </div>
+            <div class="form-text">Dapatkan dari <a href="https://t.me/BotFather" target="_blank">@BotFather</a> di Telegram</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Chat ID (Grup/Channel)</label>
+            <input type="text" name="telegram_chat_id" id="tgChatId" class="form-control font-monospace" value="<%= settings.telegram_chat_id || '' %>" placeholder="-1001234567890" pattern="-?\d+" title="Harus berupa angka">
+            <div class="form-text">Chat ID grup atau channel Telegram (hanya angka). <span id="chatIdHelp">Wajib diisi untuk mode Grup atau Keduanya.</span></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Mode Pengiriman Notifikasi</label>
+            <select name="telegram_notify_mode" id="tgNotifyMode" class="form-select" onchange="toggleChatIdRequired()">
+              <option value="group" <%= (settings.telegram_notify_mode || 'group') === 'group' ? 'selected' : '' %>>Grup/Channel saja</option>
+              <option value="dm" <%= settings.telegram_notify_mode === 'dm' ? 'selected' : '' %>>DM Personal ke Teknisi saja</option>
+              <option value="both" <%= settings.telegram_notify_mode === 'both' ? 'selected' : '' %>>Grup & DM Teknisi (Keduanya)</option>
+            </select>
+            <div class="form-text">
+              <strong>Grup:</strong> Kirim ke Chat ID grup di atas.<br>
+              <strong>DM Personal:</strong> Kirim langsung ke setiap teknisi yang sudah daftar bot (punya chat ID).<br>
+              <strong>Keduanya:</strong> Kirim ke grup sekaligus DM ke tiap teknisi.
+            </div>
+          </div>
+          <div class="mb-3 form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="telegram_enabled" name="telegram_enabled" value="true"
+              <%= settings.telegram_enabled === 'true' ? 'checked' : '' %>>
+            <label class="form-check-label" for="telegram_enabled">Aktifkan Notifikasi Telegram (Outbound)</label>
+          </div>
+          <div class="mb-3 form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="telegram_inbound" name="telegram_bot_inbound" value="true"
+              <%= settings.telegram_bot_inbound === 'true' ? 'checked' : '' %>>
+            <label class="form-check-label" for="telegram_inbound">Aktifkan Telegram Bot Inbound (Lapor via Chat)</label>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Webhook URL (untuk Bot Inbound)</label>
+            <input type="url" name="telegram_webhook_url" class="form-control" value="<%= settings.telegram_webhook_url || '' %>" placeholder="https://domain-anda.com">
+            <div class="form-text">Kosongkan jika menggunakan polling. Contoh: https://anda.com (tanpa trailing slash)</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-save"></i> Simpan</button>
+            <button type="button" class="btn btn-outline-secondary btn-3d" id="btnTestTg" onclick="testTelegram()">
+              <i class="bi bi-send"></i> Kirim Test
+            </button>
+          </div>
+          <div id="tgResult" class="mt-2" style="display:none"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-3">
+  <div class="col-md-6 mb-3">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-whatsapp"></i> WhatsApp Business API</h6></div>
+      <div class="card-body">
+        <form method="POST" action="/admin/settings/whatsapp">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3 form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="whatsapp_enabled" name="whatsapp_enabled" value="true"
+              <%= settings.whatsapp_enabled === 'true' ? 'checked' : '' %>>
+            <label class="form-check-label" for="whatsapp_enabled">Aktifkan Integrasi WhatsApp</label>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">API URL</label>
+            <input type="url" name="whatsapp_api_url" class="form-control" value="<%= settings.whatsapp_api_url || '' %>" placeholder="https://graph.facebook.com/v21.0">
+            <div class="form-text">WhatsApp Business API endpoint (Meta Cloud API atau provider lain)</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">API Key / Access Token</label>
+            <input type="password" name="whatsapp_api_key" class="form-control font-monospace" value="<%= settings.whatsapp_api_key || '' %>" placeholder="EAAG...">
+            <div class="form-text">Gunakan <strong>Permanent Token</strong> (System User) untuk produksi. Token sementara dari Graph Explorer hanya 24 jam.</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Phone Number ID</label>
+              <input type="text" name="whatsapp_phone_number_id" class="form-control" value="<%= settings.whatsapp_phone_number_id || '' %>" placeholder="1234567890">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Verify Token</label>
+              <input type="text" name="whatsapp_verify_token" class="form-control" value="<%= settings.whatsapp_verify_token || '' %>" placeholder="token_verify_anda">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-save"></i> Simpan</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-stopwatch"></i> Target SLA</h6></div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr>
+              <th>Prioritas</th>
+              <th>Validasi (jam)</th>
+              <th>Investigasi (jam)</th>
+              <th>Selesai (jam)</th>
+              <th style="width:50px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% slaTargets.forEach(function(s) { %>
+            <form method="POST" action="/admin/settings/sla" onsubmit="Modal3D.showLoading('Menyimpan SLA...')">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <input type="hidden" name="id" value="<%= s.id %>">
+              <tr>
+                <td><span class="badge <%= {ringan:'bg-success', sedang:'bg-warning', berat:'bg-danger', kritis:'bg-dark'}[s.prioritas] %>"><%= s.prioritas %></span></td>
+                <td><input type="number" name="batas_validasi_jam" class="form-control form-control-sm" value="<%= s.batas_validasi_jam %>" min="1" required></td>
+                <td><input type="number" name="batas_investigasi_jam" class="form-control form-control-sm" value="<%= s.batas_investigasi_jam %>" min="1" required></td>
+                <td><input type="number" name="batas_selesai_jam" class="form-control form-control-sm" value="<%= s.batas_selesai_jam %>" min="1" required></td>
+                <td><button type="submit" class="btn btn-sm btn-primary btn-3d"><i class="bi bi-check"></i></button></td>
+              </tr>
+            </form>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 mb-3">
+    <div class="card border-success">
+      <div class="card-header bg-success bg-opacity-10"><h6 class="mb-0"><i class="bi bi-key"></i> Cara Dapatkan Permanent Token (Gratis)</h6></div>
+      <div class="card-body small d-flex flex-column">
+        <p class="mb-2"><strong>Token permanen tidak expired</strong> — cocok untuk produksi. Ikuti langkah ini:</p>
+        <ol class="mb-3 flex-grow-1">
+          <li>Buka <a href="https://business.facebook.com/settings/system-users" target="_blank" class="text-decoration-none"><strong>Meta Business Settings → System Users</strong></a></li>
+          <li>Klik <strong>Add</strong> → Buat <em>System User</em> (role: Admin)</li>
+          <li>Pilih System User tadi → <strong>Generate New Token</strong></li>
+          <li>Centang: <code>whatsapp_business_management</code> + <code>whatsapp_business_messaging</code></li>
+          <li>Copy token → Paste ke field <strong>API Key / Access Token</strong> di atas</li>
+          <li>Phone Number ID: lihat di <strong>WhatsApp Accounts → Settings → Phone Numbers</strong></li>
+        </ol>
+        <div class="alert alert-info py-2 mb-0 mt-auto">
+          <i class="bi bi-info-circle"></i> <strong>Gratis:</strong> 1.000 percakapan/bln. Di atasnya ~$0.005–$0.09/percakapan (Indonesia).
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-3 border-info">
+      <div class="card-header bg-info bg-opacity-10">
+        <h6 class="mb-0"><i class="bi bi-question-circle"></i> Penjelasan SLA</h6>
+      </div>
+      <div class="card-body small d-flex flex-column">
+        <p><strong>SLA (Service Level Agreement)</strong> = target batas waktu penanganan laporan. Sistem mengecek setiap 5 menit apakah ada laporan yang melanggar SLA, lalu mengirim notifikasi ke admin.</p>
+
+        <div class="flex-grow-1">
+        <h6 class="mt-3">Alur Laporan</h6>
+        <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+          <span class="badge bg-secondary">dilaporkan</span>
+          <span class="text-muted">→</span>
+          <span class="badge bg-primary">divalidasi</span>
+          <span class="text-muted">→</span>
+          <span class="badge bg-info text-dark">investigasi</span>
+          <span class="text-muted">→</span>
+          <span class="badge bg-warning text-dark">dalam_perbaikan</span>
+          <span class="text-muted">→</span>
+          <span class="badge bg-success">selesai</span>
+        </div>
+
+        <h6 class="mt-3">3 Tahap Waktu</h6>
+        <table class="table table-sm table-bordered mb-0">
+          <tr>
+            <th style="width:120px">Field</th>
+            <th>Dimulai dari</th>
+            <th>Berakhir saat</th>
+          </tr>
+          <tr>
+            <td><strong>Validasi</strong></td>
+            <td>Laporan dibuat (<code>created_at</code>)</td>
+            <td>Laporan divalidasi (<code>tgl_validasi</code>)</td>
+          </tr>
+          <tr>
+            <td><strong>Investigasi</strong></td>
+            <td>Laporan divalidasi (<code>tgl_validasi</code>)</td>
+            <td>Investigasi dimulai (<code>tgl_investigasi</code>)</td>
+          </tr>
+          <tr>
+            <td><strong>Selesai</strong></td>
+            <td>Mulai dikerjakan (<code>tgl_mulai_perbaikan</code>)</td>
+            <td>Laporan selesai (<code>tgl_selesai</code>)</td>
+          </tr>
+        </table>
+
+        <h6 class="mt-3">Contoh Pelanggaran</h6>
+        <p class="mb-1">Laporan prioritas <strong>KRITIS</strong> dibuat jam 08:00:</p>
+        <ul class="mb-0">
+          <li>Jam 10:30 belum divalidasi → <span class="text-danger">SLA Violation</span> (2.5 jam > 2 jam)</li>
+          <li>Jam 14:00 belum investigasi → <span class="text-danger">SLA Violation</span></li>
+          <li>Besok jam 10:00 belum selesai → <span class="text-danger">SLA Violation</span></li>
+        </ul>
+        </div>
+
+        <h6 class="mt-4 mt-auto">Alur Tiket</h6>
+        <p class="mb-0">Tiket menggunakan mapping: <code>rendah→ringan</code>, <code>sedang→sedang</code>, <code>tinggi→berat</code>, <code>kritis→kritis</code>. Tahap hanya <strong>Validasi</strong> (open) dan <strong>Selesai</strong> (in_progress).</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-3">
+  <div class="col-md-12 mb-3">
+    <div class="card border-warning">
+      <div class="card-header bg-warning bg-opacity-10">
+        <h6 class="mb-0"><i class="bi bi-shield-lock me-2"></i> Keamanan: Two-Factor Authentication (2FA)</h6>
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-3">Aktifkan 2FA untuk keamanan tambahan. Setelah diaktifkan, Anda akan dimasukkan kode OTP saat login.</p>
+        <a href="/admin/2fa" class="btn btn-warning btn-3d">
+          <i class="bi bi-gear"></i> Atur 2FA
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleTgToken() {
+  var inp = document.getElementById('tgToken');
+  var icon = document.getElementById('tgTokenIcon');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.className = 'bi bi-eye-slash';
+  } else {
+    inp.type = 'password';
+    icon.className = 'bi bi-eye';
+  }
+}
+
+function toggleChatIdRequired() {
+  var mode = document.getElementById('tgNotifyMode').value;
+  var chatId = document.getElementById('tgChatId');
+  var help = document.getElementById('chatIdHelp');
+  if (mode === 'dm') {
+    chatId.removeAttribute('required');
+    chatId.classList.remove('is-invalid');
+    help.textContent = 'Tidak wajib untuk mode DM Personal.';
+  } else {
+    chatId.setAttribute('required', 'required');
+    help.textContent = 'Wajib diisi untuk mode Grup atau Keduanya.';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() { toggleChatIdRequired(); });
+
+function testTelegram() {
+  var btn = document.getElementById('btnTestTg');
+  var result = document.getElementById('tgResult');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Mengirim...';
+  result.style.display = 'block';
+  result.className = 'alert alert-info';
+  result.textContent = 'Mengirim pesan test...';
+
+  fetch('/admin/settings/telegram/test', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      result.className = data.ok ? 'alert alert-success' : 'alert alert-danger';
+      result.textContent = data.message;
+    })
+    .catch(function() {
+      result.className = 'alert alert-danger';
+      result.textContent = 'Gagal mengirim pesan test';
+    })
+    .finally(function() {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-send"></i> Kirim Test';
+    });
+}
+</script>

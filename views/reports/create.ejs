@@ -1,0 +1,71 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-body">
+        <form method="POST" action="/reports/store" enctype="multipart/form-data" onsubmit="Modal3D.showLoading('Menyimpan laporan...')">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label">Unit/Ruangan <span class="text-danger">*</span></label>
+            <select name="id_unit" class="form-select" required>
+              <option value="">-- Pilih Unit --</option>
+              <% units.forEach(function(u) { %>
+              <option value="<%= u.id %>" <%= (user && user.id_unit && user.id_unit === u.id) ? 'selected' : '' %>><%= u.nama_unit %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Kategori Perangkat</label>
+            <select name="id_kategori" class="form-select">
+              <option value="">-- Pilih Kategori --</option>
+              <% categories.forEach(function(c) { %>
+              <option value="<%= c.id %>"><%= c.nama_kategori %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Nama Perangkat <span class="text-danger">*</span></label>
+            <input type="text" name="nama_perangkat" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Deskripsi Kerusakan</label>
+            <textarea name="deskripsi" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Prioritas <span class="text-danger">*</span></label>
+              <select name="prioritas" class="form-select" required>
+                <option value="ringan">Ringan</option>
+                <option value="sedang">Sedang</option>
+                <option value="berat">Berat</option>
+                <option value="kritis">Kritis</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Foto Kerusakan</label>
+              <input type="file" name="foto" class="form-control" accept="image/*">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-3d">
+            <i class="bi bi-send"></i> Kirim Laporan
+          </button>
+          <a href="/reports" class="btn btn-secondary">Batal</a>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-info-circle"></i> Panduan</h6></div>
+      <div class="card-body small">
+        <p>Laporkan kerusakan perangkat di unit Anda dengan mengisi form di samping.</p>
+        <p><strong>Prioritas:</strong></p>
+        <ul>
+          <li><span class="badge bg-success">Ringan</span> — Tidak mengganggu operasional</li>
+          <li><span class="badge bg-warning">Sedang</span> — Mengganggu sebagian</li>
+          <li><span class="badge bg-danger">Berat</span> — Mengganggu operasional</li>
+          <li><span class="badge bg-dark">Kritis</span> — Mengancam keselamatan</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

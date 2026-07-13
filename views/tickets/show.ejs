@@ -1,0 +1,295 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0"><i class="bi bi-ticket"></i> <%= ticket.no_tiket %> - <%= ticket.subjek %></h6>
+        <span>
+          <% var sClass = {open:'bg-primary', in_progress:'bg-info', resolved:'bg-success', closed:'bg-secondary', reopened:'bg-warning'}[ticket.status] || 'bg-secondary'; %>
+          <% var sLabel = {open:'Terbuka', in_progress:'Dalam Pengerjaan', resolved:'Terselesaikan', closed:'Ditutup', reopened:'Dibuka Ulang'}[ticket.status] || ticket.status; %>
+          <span class="badge <%= sClass %>"><%= sLabel %></span>
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-3"><strong>Kategori:</strong> <span class="badge bg-info"><%= ticket.kategori %></span></div>
+          <div class="col-md-3">
+            <strong>Prioritas:</strong>
+            <% var pClass = {rendah:'bg-success', sedang:'bg-warning', tinggi:'bg-danger', kritis:'bg-dark'}[ticket.prioritas] || 'bg-secondary'; %>
+            <span class="badge <%= pClass %>"><%= ticket.prioritas %></span>
+          </div>
+          <div class="col-md-3"><strong>Sumber:</strong> <%= ticket.sumber %></div>
+          <div class="col-md-3"><strong>Unit:</strong> <%= ticket.unit ? ticket.unit.nama_unit : '-' %></div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-4"><strong>Pelapor:</strong> <%= ticket.pelapor ? ticket.pelapor.nama_lengkap : '-' %></div>
+          <div class="col-md-4"><strong>Teknisi:</strong> <% if (ticket.teknisi) { %><%= ticket.teknisi.nama_lengkap %><% } else { %><span class="text-muted">Belum ditugaskan</span><% } %>
+            <% if (ticket.additionalTechnicians && ticket.additionalTechnicians.length > 0) { %>
+              <br><small class="text-muted">Teknisi pendukung:
+              <% ticket.additionalTechnicians.forEach(function(at) { %>
+                <span class="badge bg-info"><%= at.user.nama_lengkap %></span>
+              <% }); %></small>
+            <% } %></div>
+          <div class="col-md-4"><strong>Tanggal:</strong> <%= fmtDate(ticket.created_at) %></div>
+        </div>
+        <% if (ticket.deskripsi) { %>
+        <div class="mb-3">
+          <strong>Deskripsi:</strong>
+          <p class="text-muted mt-1"><%= ticket.deskripsi %></p>
+        </div>
+        <% } %>
+        <% if (ticket.foto) { %>
+        <div class="mb-3">
+          <strong>Foto Bukti:</strong>
+          <div class="mt-1">
+            <a href="/uploads/<%= ticket.foto %>" target="_blank">
+              <img src="/uploads/<%= ticket.foto %>" class="img-thumbnail" style="max-height:200px;" alt="Foto Bukti">
+            </a>
+          </div>
+        </div>
+        <% } %>
+        <% if (ticket.akar_penyebab) { %>
+        <div class="mb-3">
+          <strong>Akar Penyebab:</strong>
+          <p class="text-muted mt-1"><%= ticket.akar_penyebab %></p>
+        </div>
+        <% } %>
+        <% if (ticket.solusi) { %>
+        <div class="mb-0">
+          <strong>Solusi:</strong>
+          <p class="text-muted mt-1"><%= ticket.solusi %></p>
+        </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Timeline / History -->
+    <div class="card mb-3">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-clock-history"></i> Riwayat Tiket</h6></div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+          <% if (ticket.histories && ticket.histories.length) { %>
+            <% ticket.histories.forEach(function(h) { %>
+            <li class="list-group-item">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <span class="badge bg-secondary me-2"><%= h.status %></span>
+                  <span><%= h.catatan %></span>
+                </div>
+                <small class="text-muted">
+                  <%= h.user ? h.user.nama_lengkap : '-' %> - <%= fmtDate(h.created_at) %>
+                </small>
+              </div>
+            </li>
+            <% }); %>
+          <% } else { %>
+            <li class="list-group-item text-center text-muted">Belum ada riwayat</li>
+          <% } %>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Add Note -->
+    <div class="card mb-3">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-chat-dots"></i> Tambah Catatan</h6></div>
+      <div class="card-body">
+        <form method="POST" action="/tickets/<%= ticket.id %>/catatan">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-2">
+            <textarea name="catatan" class="form-control" rows="2" placeholder="Tulis catatan..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-sm btn-primary btn-3d"><i class="bi bi-send"></i> Kirim</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Rating Form (for pelapor when ticket is resolved/closed) -->
+    <% if (['resolved', 'closed'].includes(ticket.status) && user.role === 'pelapor' && user.id === ticket.id_pelapor) { %>
+    <div class="card border-warning">
+      <div class="card-header bg-warning"><h6 class="mb-0"><i class="bi bi-star"></i> Rating Kepuasan</h6></div>
+      <div class="card-body">
+        <% if (ticket.rating) { %>
+        <div class="alert alert-info mb-0">
+          <p class="mb-1">Anda sudah memberikan rating:</p>
+          <div class="mb-1">
+            <% for (var s = 1; s <= 5; s++) { %>
+            <i class="bi bi-star<%= s <= ticket.rating.bintang ? '-fill text-warning' : ' text-muted' %>"></i>
+            <% } %>
+            <strong class="ms-2"><%= ticket.rating.bintang %>/5</strong>
+          </div>
+          <% if (ticket.rating.komentar) { %><p class="mb-0 text-muted"><em>"<%= ticket.rating.komentar %>"</em></p><% } %>
+        </div>
+        <% } else { %>
+        <form method="POST" action="/ratings/tickets/<%= ticket.id %>">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label">Beri Rating:</label>
+            <div class="rating-stars" id="ratingStarsTicket">
+              <% for (var s = 1; s <= 5; s++) { %>
+              <i class="bi bi-star fs-3 text-muted rating-star-ticket" data-value="<%= s %>" style="cursor:pointer;" onclick="setRatingTicket(<%= s %>)"></i>
+              <% } %>
+              <input type="hidden" name="bintang" id="ratingValueTicket" value="0">
+              <span class="ms-2 text-muted" id="ratingTextTicket">Pilih rating</span>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Komentar (opsional)</label>
+            <textarea name="komentar" class="form-control" rows="2" placeholder="Bagaimana penilaian Anda terhadap penanganan tiket?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-warning btn-3d" id="btnSubmitRatingTicket" disabled>
+            <i class="bi bi-send"></i> Kirim Rating
+          </button>
+        </form>
+        <% } %>
+      </div>
+    </div>
+    <% } %>
+  </div>
+
+  <div class="col-md-4">
+    <!-- Actions -->
+    <div class="card mb-3">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-gear"></i> Aksi</h6></div>
+      <div class="card-body">
+        <% if (['open', 'reopened'].includes(ticket.status) && (user.role === 'admin' || user.role === 'teknisi')) { %>
+        <form method="POST" action="/tickets/<%= ticket.id %>/ambil-tugas" onsubmit="Modal3D.showLoading('Mengambil tiket...')" class="mb-2">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="btn btn-primary btn-3d w-100"><i class="bi bi-hand-index"></i> Ambil Tiket</button>
+        </form>
+        <% } %>
+
+        <% if (['in_progress', 'open', 'reopened'].includes(ticket.status) && (user.role === 'admin' || user.role === 'teknisi')) { %>
+        <form method="POST" action="/tickets/<%= ticket.id %>/selesai" enctype="multipart/form-data" onsubmit="Modal3D.showLoading('Memproses tiket...')" class="mb-2">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-2">
+            <label class="form-label small fw-bold">Akar Penyebab <span class="text-danger">*</span></label>
+            <textarea name="akar_penyebab" class="form-control" rows="2" placeholder="Akar penyebab masalah..." required></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small fw-bold">Solusi <span class="text-danger">*</span></label>
+            <textarea name="solusi" class="form-control" rows="2" placeholder="Solusi yang diberikan..." required></textarea>
+          </div>
+          <div class="mb-2">
+            <textarea name="catatan" class="form-control" rows="2" placeholder="Catatan tambahan (opsional)..."></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small fw-bold">Foto Bukti (opsional)</label>
+            <input type="file" name="foto" class="form-control" accept="image/*">
+            <small class="text-muted">Upload foto hasil pekerjaan</small>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" name="action" value="resolve" class="btn btn-success btn-3d flex-fill"><i class="bi bi-check-lg"></i> Selesaikan</button>
+            <button type="submit" name="action" value="close" class="btn btn-secondary btn-3d flex-fill"><i class="bi bi-x-lg"></i> Tutup</button>
+          </div>
+        </form>
+        <% } %>
+
+        <% if (ticket.status === 'resolved') { %>
+        <form method="POST" action="/tickets/<%= ticket.id %>/buka-ulang" onsubmit="Modal3D.showLoading('Membuka ulang...')" class="mb-2">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-2">
+            <textarea name="catatan" class="form-control" rows="1" placeholder="Alasan dibuka ulang..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-warning btn-3d w-100"><i class="bi bi-arrow-counterclockwise"></i> Buka Ulang</button>
+        </form>
+        <% } %>
+
+        <!-- Assign Technician (Admin only) -->
+        <% if (user.role === 'admin') { %>
+        <hr>
+        <form method="POST" action="/tickets/<%= ticket.id %>/assign">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <label class="form-label small">Tugaskan Teknisi</label>
+          <div class="input-group input-group-sm mb-2">
+            <select name="id_teknisi" class="form-select">
+              <option value="">Pilih Teknisi</option>
+              <% teknisi.forEach(function(t) { %>
+              <option value="<%= t.id %>" <%= (ticket.teknisi && ticket.teknisi.id === t.id) ? 'selected' : '' %>><%= t.nama_lengkap %></option>
+              <% }) %>
+            </select>
+            <button type="submit" class="btn btn-outline-primary btn-3d"><i class="bi bi-person-check"></i></button>
+          </div>
+        </form>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="card mb-3">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-info-circle"></i> Informasi</h6></div>
+      <div class="card-body small">
+        <div class="mb-1"><strong>Dibuat:</strong> <%= fmtDate(ticket.created_at) %></div>
+        <div class="mb-1"><strong>Update:</strong> <%= fmtDate(ticket.updated_at) %></div>
+        <% if (ticket.tgl_selesai) { %><div class="mb-1"><strong>Selesai:</strong> <%= fmtDate(ticket.tgl_selesai) %></div><% } %>
+      </div>
+    </div>
+
+    <!-- SLA -->
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-stopwatch"></i> SLA</h6></div>
+      <div class="card-body small">
+        <% 
+        var slaMap = {};
+        slaTargets.forEach(function(s) { slaMap[s.prioritas] = s; });
+        var ticketSlaMap = { rendah: 'ringan', sedang: 'sedang', tinggi: 'berat', kritis: 'kritis' };
+        var slaKey = ticketSlaMap[ticket.prioritas] || ticket.prioritas;
+        var sla = slaMap[slaKey];
+        var totJam = ticket.tgl_selesai ? Math.round((new Date(ticket.tgl_selesai) - new Date(ticket.created_at)) / (1000*60*60)) : null;
+        %>
+        <div class="mb-1"><strong>Prioritas:</strong> <span class="badge <%= {rendah:'bg-success', sedang:'bg-warning', tinggi:'bg-danger', kritis:'bg-dark'}[ticket.prioritas] %>"><%= ticket.prioritas %></span></div>
+        <% if (sla) { %>
+        <div class="mb-1"><strong>Target Selesai:</strong> <%= sla.batas_selesai_jam %> jam</div>
+        <% if (totJam !== null) { %>
+        <div class="mb-0">
+          <strong>Total:</strong> <%= totJam %> jam
+          <% if (totJam <= sla.batas_selesai_jam) { %>
+            <span class="text-success"><i class="bi bi-check-circle-fill"></i> Sesuai SLA</span>
+          <% } else { %>
+            <span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Melebihi SLA</span>
+          <% } %>
+        </div>
+        <% } } else { %>
+        <div class="text-muted">Target SLA tidak tersedia untuk prioritas ini</div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<a href="/tickets" class="btn btn-sm btn-secondary btn-3d mt-3"><i class="bi bi-arrow-left"></i> Kembali ke Daftar Tiket</a>
+
+<script>
+function setRatingTicket(val) {
+  document.getElementById('ratingValueTicket').value = val;
+  var stars = document.querySelectorAll('.rating-star-ticket');
+  stars.forEach(function(star) {
+    var v = parseInt(star.dataset.value);
+    if (v <= val) {
+      star.className = 'bi bi-star-fill fs-3 text-warning rating-star-ticket';
+    } else {
+      star.className = 'bi bi-star fs-3 text-muted rating-star-ticket';
+    }
+  });
+  var labels = ['', 'Sangat Kurang', 'Kurang', 'Cukup', 'Baik', 'Sangat Baik'];
+  document.getElementById('ratingTextTicket').textContent = labels[val] || '';
+  document.getElementById('btnSubmitRatingTicket').disabled = false;
+}
+
+// Real-time update
+(function() {
+  var socket = window.socket || io();
+  var ticketId = <%= ticket.id %>;
+  var reloadTimer = null;
+
+  function matchEntity(data) {
+    var r = data.report || data;
+    return r && (r.id === ticketId);
+  }
+
+  socket.on('report_update_layanan', function(data) {
+    if (matchEntity(data)) {
+      if (reloadTimer) clearTimeout(reloadTimer);
+      reloadTimer = setTimeout(function() { location.reload(); }, 1000);
+    }
+  });
+})();
+</script>

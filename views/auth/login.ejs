@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - SIMRS Maintenance</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/css/anim-3d.css">
+  <link rel="icon" href="/uploads/<%= (typeof settings !== 'undefined' && settings && settings.logo_rs) ? settings.logo_rs : 'favicon.ico' %>" type="image/png">
+  <link rel="shortcut icon" href="/uploads/<%= (typeof settings !== 'undefined' && settings && settings.logo_rs) ? settings.logo_rs : 'favicon.ico' %>" type="image/png">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0c0e1a 0%, #1a1040 50%, #0c0e1a 100%);
+      overflow: hidden;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 50%, rgba(118, 75, 162, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 20%, rgba(0, 242, 254, 0.05) 0%, transparent 50%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .card-login-3d {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 24px;
+      box-shadow:
+        0 30px 80px rgba(0,0,0,0.5),
+        0 0 40px rgba(102, 126, 234, 0.1);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card-login-3d::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2, #43e97b, #38f9d7);
+      background-size: 300% 100%;
+      animation: gradientBar 3s ease infinite;
+    }
+
+    @keyframes gradientBar {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .card-login-3d .card-body { padding: 2.5rem; }
+
+    .logo-3d-container {
+      perspective: 400px;
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
+
+    .logo-3d {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 20px;
+      font-size: 2.2rem;
+      color: white;
+      transform-style: preserve-3d;
+      animation: logo3DFloat 3s ease-in-out infinite;
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    @keyframes logo3DFloat {
+      0%, 100% { transform: rotateX(0deg) rotateY(0deg) translateY(0); }
+      25% { transform: rotateX(5deg) rotateY(10deg) translateY(-5px); }
+      50% { transform: rotateX(0deg) rotateY(5deg) translateY(-10px); }
+      75% { transform: rotateX(-5deg) rotateY(-5deg) translateY(-5px); }
+    }
+
+    .login-title {
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 1.5rem;
+    }
+
+    .form-control-3d {
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      transition: all 0.3s ease;
+      background: rgba(248, 249, 255, 0.8);
+    }
+
+    .form-control-3d:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+      transform: scale(1.02);
+      background: white;
+    }
+
+    .btn-login-3d {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .btn-login-3d::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-login-3d:hover::before {
+      left: 100%;
+    }
+
+    .btn-login-3d:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-login-3d:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    .input-icon {
+      position: absolute;
+      top: 50%;
+      left: 14px;
+      transform: translateY(-50%);
+      color: #667eea;
+      font-size: 1.1rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper .form-control-3d {
+      padding-left: 42px;
+    }
+
+    .login-footer-text {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+    }
+
+    /* Stars background */
+    .stars {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--duration) ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Stars Background -->
+  <div class="stars" id="stars"></div>
+
+  <!-- 3D Floating Shapes -->
+  <div class="anim-3d-bg">
+    <div class="shape-3d"></div>
+    <div class="shape-3d"></div>
+    <div class="shape-3d"></div>
+    <div class="shape-3d"></div>
+    <div class="shape-3d"></div>
+    <div class="shape-3d"></div>
+  </div>
+
+  <!-- 3D Loading Overlay -->
+  <div class="loading-3d" id="loading3d">
+    <div class="loading-3d-spinner">
+      <div class="spinner-3d-logo">
+        <div class="logo-ring"></div>
+        <div class="logo-ring logo-ring-2"></div>
+        <div class="logo-ring logo-ring-3"></div>
+        <img src="/uploads/<%= (typeof settings !== 'undefined' && settings && settings.logo_rs) ? settings.logo_rs : 'favicon.ico' %>" class="spinner-logo-img" alt="logo">
+      </div>
+      <div class="loading-3d-text">MEMVALIDASI</div>
+    </div>
+  </div>
+
+  <div class="container position-relative" style="z-index:1;">
+    <div class="row justify-content-center">
+      <div class="col-md-5">
+        <div class="login-3d-wrapper">
+          <div class="card card-login-3d">
+            <div class="card-body text-center">
+              <div class="logo-3d-container">
+                <% if (settings && settings.logo_rs) { %>
+                <div class="logo-3d" style="overflow:hidden; border-radius:50%; width:100px; height:100px;">
+                  <img src="/uploads/<%= settings.logo_rs %>" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <% } else { %>
+                <div class="logo-3d">
+                  <i class="bi bi-tools"></i>
+                </div>
+                <% } %>
+              </div>
+              <h4 class="login-title mb-1"><%= (settings && settings.nama_rs) ? settings.nama_rs : 'SIMRS Maintenance' %></h4>
+              <p class="text-muted mb-4" style="font-size:0.9rem;">Aplikasi Maintenance Rumah Sakit</p>
+
+              <% if (success && success.length) { %>
+                <div class="alert alert-success"><%= success[0] %></div>
+              <% } %>
+              <% if (error && error.length) { %>
+                <div class="alert alert-danger"><%= error[0] %></div>
+              <% } %>
+
+              <form method="POST" action="/auth/login" id="loginForm" data-3d-loading>
+                <div class="mb-3 text-start">
+                  <label class="form-label fw-semibold text-muted small">Username</label>
+                  <div class="input-wrapper">
+                    <i class="bi bi-person input-icon"></i>
+                    <input type="text" name="username" class="form-control form-control-3d" placeholder="Masukkan username" required autofocus>
+                  </div>
+                </div>
+                <div class="mb-4 text-start">
+                  <label class="form-label fw-semibold text-muted small">Password</label>
+                  <div class="input-wrapper">
+                    <i class="bi bi-lock input-icon"></i>
+                    <input type="password" name="password" class="form-control form-control-3d" placeholder="Masukkan password" required>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-login-3d w-100" id="loginBtn">
+                  <i class="bi bi-box-arrow-in-right me-2"></i> MASUK
+                </button>
+              </form>
+            </div>
+          </div>
+          <p class="text-center login-footer-text mt-3">
+            &copy; 2026 SIMRS Maintenance
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="/js/modal-3d.js"></script>
+  <script>
+    // Stars generator
+    (function() {
+      const container = document.getElementById('stars');
+      for (let i = 0; i < 80; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.setProperty('--duration', (2 + Math.random() * 3) + 's');
+        star.style.animationDelay = (Math.random() * 3) + 's';
+        star.style.width = star.style.height = (1 + Math.random() * 2) + 'px';
+        container.appendChild(star);
+      }
+    })();
+
+    // Login form 3D loading
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> MEMVALIDASI...';
+      if (typeof Modal3D !== 'undefined') {
+        Modal3D.showLoading('MEMVALIDASI');
+      }
+      setTimeout(function() {
+        e.target.submit();
+      }, 400);
+    });
+
+    // Input focus effects
+    document.querySelectorAll('.form-control-3d').forEach(input => {
+      input.addEventListener('focus', function() {
+        this.closest('.input-wrapper').querySelector('.input-icon').style.color = '#764ba2';
+      });
+      input.addEventListener('blur', function() {
+        this.closest('.input-wrapper').querySelector('.input-icon').style.color = '#667eea';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<div class="card" style="max-width:500px">
+  <div class="card-body">
+    <form method="POST" action="<%= category ? '/admin/categories/' + category.id + '/update' : '/admin/categories/store' %>">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="mb-3">
+        <label class="form-label">Nama Kategori <span class="text-danger">*</span></label>
+        <input type="text" name="nama_kategori" class="form-control form-control-lg" value="<%= category ? category.nama_kategori : '' %>" required autofocus>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Layanan <span class="text-danger">*</span></label>
+        <select name="id_layanan" class="form-select form-select-lg" required>
+          <option value="">Pilih Layanan</option>
+          <% layanans.forEach(function(l) { %>
+          <option value="<%= l.id %>" <%= (category && category.id_layanan == l.id) ? 'selected' : '' %>><%= l.nama_layanan %></option>
+          <% }) %>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-save me-1"></i> Simpan</button>
+      <a href="/admin/categories" class="btn btn-secondary btn-3d">Batal</a>
+    </form>
+  </div>
+</div>

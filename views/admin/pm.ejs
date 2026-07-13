@@ -1,0 +1,89 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <a href="/admin/pm/create" class="btn btn-primary btn-3d"><i class="bi bi-plus-lg"></i> Tambah Jadwal</a>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="GET" action="/admin/pm" class="auto-filter row g-2">
+      <div class="col-md-3">
+        <select name="status" class="form-select form-select-sm">
+          <option value="">Semua Status</option>
+          <option value="aktif" <%= filters.status === 'aktif' ? 'selected' : '' %>>Aktif</option>
+          <option value="nonaktif" <%= filters.status === 'nonaktif' ? 'selected' : '' %>>Nonaktif</option>
+          <option value="selesai" <%= filters.status === 'selesai' ? 'selected' : '' %>>Selesai</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select name="frekuensi" class="form-select form-select-sm">
+          <option value="">Semua Frekuensi</option>
+          <option value="harian" <%= filters.frekuensi === 'harian' ? 'selected' : '' %>>Harian</option>
+          <option value="mingguan" <%= filters.frekuensi === 'mingguan' ? 'selected' : '' %>>Mingguan</option>
+          <option value="bulanan" <%= filters.frekuensi === 'bulanan' ? 'selected' : '' %>>Bulanan</option>
+          <option value="kuartalan" <%= filters.frekuensi === 'kuartalan' ? 'selected' : '' %>>Kuartalan</option>
+          <option value="tahunan" <%= filters.frekuensi === 'tahunan' ? 'selected' : '' %>>Tahunan</option>
+        </select>
+      </div>
+      <div class="col-md-4 d-flex gap-2">
+        <button type="submit" class="btn btn-sm btn-primary btn-3d"><i class="bi bi-search"></i> Filter</button>
+        <a href="/admin/pm" class="btn btn-sm btn-outline-secondary btn-3d">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0 table-datatable">
+      <thead>
+        <tr>
+          <th width="40">No</th>
+          <th>Nama Perangkat</th>
+          <th>Frekuensi</th>
+          <th>Terakhir</th>
+          <th>Berikutnya</th>
+          <th>Status</th>
+          <th>Teknisi</th>
+          <th width="180">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (pms.length) { pms.forEach(function(p, i) { %>
+        <tr class="<%= p.status_label === 'terlambat' ? 'table-danger' : '' %>">
+          <td><%= i + 1 %></td>
+          <td>
+            <%= p.nama_perangkat %>
+            <% if (p.status_label === 'terlambat') { %>
+              <span class="badge bg-danger ms-1">Terlambat</span>
+            <% } else if (p.status_label === 'on_track') { %>
+              <span class="badge bg-success ms-1">On Track</span>
+            <% } %>
+          </td>
+          <td><span class="badge bg-info"><%= p.frekuensi %></span></td>
+          <td><%= p.terakhir_dilakukan || '-' %></td>
+          <td><%= p.berikutnya || '-' %></td>
+          <td>
+            <% var sClass = {aktif:'bg-success', nonaktif:'bg-secondary', selesai:'bg-primary'}[p.status] || 'bg-secondary'; %>
+            <span class="badge <%= sClass %>"><%= p.status %></span>
+          </td>
+          <td><%= p.teknisi ? p.teknisi.nama_lengkap : '-' %></td>
+          <td>
+            <% if (p.status === 'aktif' && p.status_label === 'terlambat') { %>
+            <form method="POST" action="/admin/pm/<%= p.id %>/complete" class="d-inline">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-sm btn-success btn-3d" title="Selesaikan" onclick="return confirm('Tandai maintenance selesai?')"><i class="bi bi-check-circle"></i></button>
+            </form>
+            <% } %>
+            <a href="/admin/pm/<%= p.id %>/edit" class="btn btn-sm btn-outline-primary btn-3d" title="Edit"><i class="bi bi-pencil"></i></a>
+            <form method="POST" action="/admin/pm/<%= p.id %>/delete" class="d-inline" onsubmit="return confirm('Hapus jadwal PM ini?')">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-sm btn-outline-danger btn-3d" title="Hapus"><i class="bi bi-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+        <% }); } %>
+      </tbody>
+    </table>
+  </div>
+</div>

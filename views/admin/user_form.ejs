@@ -1,0 +1,41 @@
+<div class="card">
+  <div class="card-body">
+    <form method="POST" action="<%= user ? '/admin/users/' + user.id + '/update' : '/admin/users/store' %>" onsubmit="Modal3D.showLoading('Menyimpan pengguna...')">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="mb-3">
+        <label class="form-label">Username <span class="text-danger">*</span></label>
+        <input type="text" name="username" class="form-control" value="<%= user ? user.username : '' %>" <%= user ? 'readonly' : 'required' %>>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password <%= !user ? '<span class="text-danger">*</span>' : '' %></label>
+        <input type="password" name="password" class="form-control" <%= !user ? 'required' : '' %>>
+        <% if (user) { %><div class="form-text">Kosongkan jika tidak ingin mengubah password</div><% } %>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+        <input type="text" name="nama_lengkap" class="form-control" value="<%= user ? user.nama_lengkap : '' %>" required>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Role <span class="text-danger">*</span></label>
+          <select name="role" class="form-select" required>
+            <option value="pelapor" <%= user && user.role === 'pelapor' ? 'selected' : '' %>>Pelapor</option>
+            <option value="teknisi" <%= user && user.role === 'teknisi' ? 'selected' : '' %>>Teknisi</option>
+            <option value="admin" <%= user && user.role === 'admin' ? 'selected' : '' %>>Admin</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Unit</label>
+          <select name="id_unit" class="form-select">
+            <option value="">-- Tidak ada --</option>
+            <% units.forEach(function(u) { %>
+            <option value="<%= u.id %>" <%= user && user.id_unit === u.id ? 'selected' : '' %>><%= u.nama_unit %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-save"></i> Simpan</button>
+      <a href="/admin/users" class="btn btn-secondary">Batal</a>
+    </form>
+  </div>
+</div>

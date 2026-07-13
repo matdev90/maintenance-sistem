@@ -1,0 +1,216 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div></div>
+  <a href="/tickets/create" class="btn btn-primary btn-3d"><i class="bi bi-plus-lg"></i> Buat Tiket Baru</a>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form id="filterForm" class="auto-filter row g-2 align-items-end">
+      <div class="col-md-2">
+        <label class="form-label small">Status</label>
+        <select name="status" class="form-select form-select-sm filter-input">
+          <option value="">Semua Status</option>
+          <option value="open" <%= filters.status === 'open' ? 'selected' : '' %>>Terbuka</option>
+          <option value="in_progress" <%= filters.status === 'in_progress' ? 'selected' : '' %>>Dalam Pengerjaan</option>
+          <option value="resolved" <%= filters.status === 'resolved' ? 'selected' : '' %>>Terselesaikan</option>
+          <option value="closed" <%= filters.status === 'closed' ? 'selected' : '' %>>Ditutup</option>
+          <option value="reopened" <%= filters.status === 'reopened' ? 'selected' : '' %>>Dibuka Ulang</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Prioritas</label>
+        <select name="prioritas" class="form-select form-select-sm filter-input">
+          <option value="">Semua Prioritas</option>
+          <option value="rendah" <%= filters.prioritas === 'rendah' ? 'selected' : '' %>>Rendah</option>
+          <option value="sedang" <%= filters.prioritas === 'sedang' ? 'selected' : '' %>>Sedang</option>
+          <option value="tinggi" <%= filters.prioritas === 'tinggi' ? 'selected' : '' %>>Tinggi</option>
+          <option value="kritis" <%= filters.prioritas === 'kritis' ? 'selected' : '' %>>Kritis</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Kategori</label>
+        <select name="kategori" class="form-select form-select-sm filter-input">
+          <option value="">Semua Kategori</option>
+          <option value="hardware" <%= filters.kategori === 'hardware' ? 'selected' : '' %>>Hardware</option>
+          <option value="software" <%= filters.kategori === 'software' ? 'selected' : '' %>>Software</option>
+          <option value="jaringan" <%= filters.kategori === 'jaringan' ? 'selected' : '' %>>Jaringan</option>
+          <option value="akun" <%= filters.kategori === 'akun' ? 'selected' : '' %>>Akun</option>
+          <option value="lainnya" <%= filters.kategori === 'lainnya' ? 'selected' : '' %>>Lainnya</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">Cari</label>
+        <input type="text" name="q" class="form-control form-control-sm filter-input" placeholder="No. tiket, subjek..." value="<%= filters.q || '' %>">
+      </div>
+      <div class="col-md-1">
+        <button type="submit" class="btn btn-sm btn-primary w-100 btn-3d"><i class="bi bi-search"></i></button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>No. Tiket</th>
+            <th>Subjek</th>
+            <th>Kategori</th>
+            <th>Prioritas</th>
+            <th>Status</th>
+            <th>Pelapor</th>
+            <th>Teknisi</th>
+            <th>Tanggal</th>
+            <th style="width:150px">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="9" class="text-center text-muted py-4">Memuat data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/pagination', { pagination, filters, baseUrl: '/tickets' }) %>
+
+<script>
+(function() {
+  var currentFilters = {
+    status: '<%= filters.status || '' %>',
+    prioritas: '<%= filters.prioritas || '' %>',
+    kategori: '<%= filters.kategori || '' %>',
+    q: '<%= filters.q || '' %>'
+  };
+
+  function buildDataUrl() {
+    var params = new URLSearchParams();
+    if (currentFilters.status) params.set('status', currentFilters.status);
+    if (currentFilters.prioritas) params.set('prioritas', currentFilters.prioritas);
+    if (currentFilters.kategori) params.set('kategori', currentFilters.kategori);
+    if (currentFilters.q) params.set('q', currentFilters.q);
+    return '/tickets/data?' + params.toString();
+  }
+
+  function priorityBadge(p) {
+    var cls = { rendah:'bg-success', sedang:'bg-warning', tinggi:'bg-danger', kritis:'bg-dark' };
+    return '<span class="badge ' + (cls[p] || 'bg-secondary') + '">' + p + '</span>';
+  }
+
+  function statusBadge(s) {
+    var labels = { open:'Terbuka', in_progress:'Dalam Pengerjaan', resolved:'Terselesaikan', closed:'Ditutup', reopened:'Dibuka Ulang' };
+    var cls = { open:'bg-primary', in_progress:'bg-info', resolved:'bg-success', closed:'bg-secondary', reopened:'bg-warning' };
+    return '<span class="badge ' + (cls[s] || 'bg-secondary') + '">' + (labels[s] || s) + '</span>';
+  }
+
+  function timeFormat(dt) {
+    var d = new Date(dt);
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' +
+           String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  }
+
+  function canEdit(t) {
+    return t.status === 'open' && !t.id_teknisi;
+  }
+
+  function renderTable(items) {
+    var tbody = document.getElementById('tableBody');
+    if (!items || items.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Belum ada tiket</td></tr>';
+      return;
+    }
+    var html = '';
+    items.forEach(function(t) {
+      var teknisiHtml = t.teknisi ? '<span class="badge bg-info">' + t.teknisi + '</span>' : '<span class="text-muted">-</span>';
+      var editHtml = canEdit(t)
+        ? '<a href="/tickets/' + t.id + '/edit" class="btn btn-sm btn-warning" title="Edit"><i class="bi bi-pencil"></i></a>'
+        : '<button class="btn btn-sm btn-warning disabled" title="Edit hanya bisa saat tiket belum ditangani teknisi" disabled><i class="bi bi-pencil"></i></button>';
+      var deleteHtml = canEdit(t)
+        ? '<form method="POST" action="/tickets/' + t.id + '/delete" class="d-inline" id="delete-ticket-' + t.id + '">' +
+          '<input type="hidden" name="_csrf" value="<%= csrfToken %>">' +
+          '<button type="button" class="btn btn-sm btn-danger" title="Hapus" data-delete-ticket="' + t.id + '"><i class="bi bi-trash"></i></button>' +
+          '</form>'
+        : '<button class="btn btn-sm btn-danger disabled" title="Hapus hanya bisa saat tiket belum ditangani teknisi" disabled><i class="bi bi-trash"></i></button>';
+
+      html += '<tr data-id="ticket_' + t.id + '">' +
+        '<td><span class="badge bg-secondary">' + t.no + '</span></td>' +
+        '<td>' + t.perangkat + '</td>' +
+        '<td>' + t.kategori + '</td>' +
+        '<td>' + priorityBadge(t.prioritas) + '</td>' +
+        '<td>' + statusBadge(t.status) + '</td>' +
+        '<td>' + (t.pelapor || '-') + '</td>' +
+        '<td>' + teknisiHtml + '</td>' +
+        '<td class="small text-muted">' + timeFormat(t.waktu) + '</td>' +
+        '<td>' +
+          '<a href="/tickets/' + t.id + '" class="btn btn-sm btn-outline-primary btn-3d" title="Detail"><i class="bi bi-eye"></i></a>' +
+          editHtml +
+          deleteHtml +
+        '</td>' +
+        '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  function loadData() {
+    fetch(buildDataUrl())
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.error) return;
+        renderTable(data.items);
+      })
+      .catch(function(e) { console.error('Load error:', e); });
+  }
+
+  function initSocket() {
+    if (typeof window.socket === 'undefined') { setTimeout(initSocket, 500); return; }
+    if (window.socket) {
+      console.log('[Tickets] Socket connected:', window.socket.connected);
+      window.socket.on('connect', function() { console.log('[Tickets] Socket connect event'); });
+      window.socket.on('new_report_layanan', function() { console.log('[Tickets] new_report_layanan'); loadData(); });
+      window.socket.on('report_update_layanan', function() { console.log('[Tickets] report_update_layanan'); loadData(); });
+    }
+  }
+
+  // Form filter submit -> reload via AJAX
+  document.getElementById('filterForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var form = e.target;
+    currentFilters.status = form.status.value;
+    currentFilters.prioritas = form.prioritas.value;
+    currentFilters.kategori = form.kategori.value;
+    currentFilters.q = form.q.value;
+    loadData();
+  });
+
+  // Delete button handler
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-delete-ticket]');
+    if (btn) {
+      e.preventDefault();
+      var id = btn.dataset.deleteTicket;
+      var form = document.getElementById('delete-ticket-' + id);
+      if (form && typeof Modal3D !== 'undefined') {
+        Modal3D.showConfirm({
+          icon: 'bi bi-exclamation-triangle',
+          title: 'Hapus Tiket',
+          message: 'Hapus tiket ini? Data yang dihapus tidak dapat dikembalikan.',
+          confirmText: 'Ya, Hapus',
+          cancelText: 'Batal',
+          type: 'danger',
+          onConfirm: function() {
+            Modal3D.showLoading('Menghapus...');
+            form.submit();
+          }
+        });
+      }
+    }
+  });
+
+  // Initial load
+  loadData();
+  initSocket();
+  setInterval(loadData, 10000); // Auto-refresh every 10 seconds
+})();
+</script>

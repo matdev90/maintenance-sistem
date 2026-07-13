@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  simrs:
+    build: .
+    container_name: simrs-app
+    ports:
+      - "2222:2222"
+    volumes:
+      - ./database.sqlite:/app/database.sqlite
+      - ./public/uploads:/app/public/uploads
+      - ./logs:/app/logs
+      - ./.env:/app/.env
+    environment:
+      - NODE_ENV=production
+      - APP_PORT=2222
+    restart: unless-stopped

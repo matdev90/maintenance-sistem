@@ -1,0 +1,90 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-box"></i> <%= asset ? 'Edit' : 'Tambah' %> Aset</h6></div>
+      <div class="card-body">
+        <form method="POST" action="<%= asset ? '/admin/assets/update/' + asset.id : '/admin/assets/store' %>" enctype="multipart/form-data">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Kode Aset *</label>
+              <input type="text" name="kode_asset" class="form-control" value="<%= asset ? asset.kode_asset : (nextKodeAsset || '') %>" placeholder="Otomatis" readonly>
+              <small class="text-muted">Diisi otomatis oleh sistem</small>
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">Nama Perangkat *</label>
+              <input type="text" name="nama_perangkat" class="form-control" value="<%= asset ? asset.nama_perangkat : '' %>" required>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Kategori</label>
+              <select name="id_kategori" class="form-select">
+                <option value="">Pilih Kategori</option>
+                <% categories.forEach(function(c) { %>
+                <option value="<%= c.id %>" <%= (asset && asset.id_kategori == c.id) ? 'selected' : '' %>><%= c.nama_kategori %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Unit/Lokasi</label>
+              <select name="id_unit" class="form-select">
+                <option value="">Pilih Unit</option>
+                <% units.forEach(function(u) { %>
+                <option value="<%= u.id %>" <%= (asset && asset.id_unit == u.id) ? 'selected' : '' %>><%= u.nama_unit %></option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Lokasi Detail</label>
+            <input type="text" name="lokasi_detail" class="form-control" value="<%= asset ? (asset.lokasi_detail || '') : '' %>" placeholder="Contoh: Ruang 101, Lantai 1">
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Merk</label>
+              <input type="text" name="merk" class="form-control" value="<%= asset ? (asset.merk || '') : '' %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Model</label>
+              <input type="text" name="model" class="form-control" value="<%= asset ? (asset.model || '') : '' %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Serial Number</label>
+              <input type="text" name="serial_number" class="form-control" value="<%= asset ? (asset.serial_number || '') : '' %>">
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Tahun Pembelian</label>
+              <input type="number" name="tahun_pembelian" class="form-control" value="<%= asset ? (asset.tahun_pembelian || '') : '' %>" min="1990" max="2099">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Kondisi</label>
+              <select name="kondisi" class="form-select">
+                <% var kondisiOpts = ['baik', 'rusak_ringan', 'rusak_berat', 'tidak_aktif']; %>
+                <% var kondisiLabel = {baik:'Baik', rusak_ringan:'Rusak Ringan', rusak_berat:'Rusak Berat', tidak_aktif:'Tidak Aktif'}; %>
+                <% kondisiOpts.forEach(function(k) { %>
+                <option value="<%= k %>" <%= (asset && asset.kondisi === k) ? 'selected' : '' %>><%= kondisiLabel[k] %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Foto</label>
+              <input type="file" name="foto" class="form-control" accept="image/*">
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-check-lg"></i> Simpan</button>
+            <a href="/admin/assets" class="btn btn-secondary btn-3d"><i class="bi bi-arrow-left"></i> Kembali</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-pencil"></i> Edit Laporan #<%= report.id %></h6></div>
+      <div class="card-body">
+        <form method="POST" action="/reports/<%= report.id %>/update" enctype="multipart/form-data" onsubmit="Modal3D.showLoading('Menyimpan perubahan...')">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-3">
+            <label class="form-label">Unit/Ruangan <span class="text-danger">*</span></label>
+            <select name="id_unit" class="form-select" required>
+              <option value="">-- Pilih Unit --</option>
+              <% units.forEach(function(u) { %>
+              <option value="<%= u.id %>" <%= report.id_unit === u.id ? 'selected' : '' %>><%= u.nama_unit %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Kategori Perangkat</label>
+            <select name="id_kategori" class="form-select">
+              <option value="">-- Pilih Kategori --</option>
+              <% categories.forEach(function(c) { %>
+              <option value="<%= c.id %>" <%= report.id_kategori === c.id ? 'selected' : '' %>><%= c.nama_kategori %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Nama Perangkat <span class="text-danger">*</span></label>
+            <input type="text" name="nama_perangkat" class="form-control" value="<%= report.nama_perangkat %>" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Deskripsi Kerusakan</label>
+            <textarea name="deskripsi" class="form-control" rows="3"><%= report.deskripsi || '' %></textarea>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Prioritas <span class="text-danger">*</span></label>
+              <select name="prioritas" class="form-select" required>
+                <option value="ringan" <%= report.prioritas === 'ringan' ? 'selected' : '' %>>Ringan</option>
+                <option value="sedang" <%= report.prioritas === 'sedang' ? 'selected' : '' %>>Sedang</option>
+                <option value="berat" <%= report.prioritas === 'berat' ? 'selected' : '' %>>Berat</option>
+                <option value="kritis" <%= report.prioritas === 'kritis' ? 'selected' : '' %>>Kritis</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Foto Kerusakan</label>
+              <input type="file" name="foto" class="form-control" accept="image/*">
+              <% if (report.foto) { %>
+              <div class="form-text">Foto saat ini: <%= report.foto %> (upload baru untuk mengganti)</div>
+              <% } %>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-3d">
+            <i class="bi bi-save"></i> Simpan Perubahan
+          </button>
+          <a href="/reports" class="btn btn-secondary">Batal</a>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-info-circle"></i> Info</h6></div>
+      <div class="card-body small">
+        <p>Status: <span class="badge bg-secondary"><%= report.status %></span></p>
+        <p>Dibuat: <%= fmtDate(report.created_at) %></p>
+        <p class="text-muted mb-0">Edit hanya tersedia saat laporan masih berstatus <strong>Dilaporkan</strong>.</p>
+      </div>
+    </div>
+  </div>
+</div>

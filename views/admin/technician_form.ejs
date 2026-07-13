@@ -1,0 +1,73 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-person-gear"></i> Profil Teknisi - <%= technician.nama_lengkap %></h6></div>
+      <div class="card-body">
+        <form method="POST" action="/admin/technicians/<%= technician.id %>/update">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Nama Lengkap</label>
+              <input type="text" class="form-control" value="<%= technician.nama_lengkap %>" disabled>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Username</label>
+              <input type="text" class="form-control" value="<%= technician.username %>" disabled>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Spesialisasi</label>
+            <input type="text" name="spesialisasi" class="form-control" value="<%= technician.techProfile ? (technician.techProfile.spesialisasi || '') : '' %>" placeholder="Contoh: komputer,printer,jaringan (pisahkan koma)">
+            <small class="text-muted">Gunakan koma untuk memisahkan spesialisasi. Contoh: komputer,printer,jaringan</small>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Max Tugas Aktif</label>
+              <input type="number" name="max_tugas_aktif" class="form-control" value="<%= technician.techProfile ? technician.techProfile.max_tugas_aktif : 5 %>" min="1" max="20">
+              <small class="text-muted">Batas maksimum tugas aktif untuk auto-assignment</small>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Telegram Chat ID</label>
+              <input type="text" name="telegram_chat_id" class="form-control" value="<%= technician.techProfile ? (technician.techProfile.telegram_chat_id || '') : '' %>" placeholder="-123456789">
+              <small class="text-muted">Chat ID Telegram untuk notifikasi langsung</small>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Nomor WhatsApp</label>
+              <input type="text" name="whatsapp_number" class="form-control" value="<%= technician.techProfile ? (technician.techProfile.whatsapp_number || '') : '' %>" placeholder="6281234567890">
+              <small class="text-muted">Format: 62xxxxxxxxxxx</small>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input type="checkbox" name="is_available" class="form-check-input" id="isAvailable" <%= (technician.techProfile && technician.techProfile.is_available) ? 'checked' : '' %>>
+              <label class="form-check-label" for="isAvailable">Tersedia untuk menerima tugas (Auto-Assignment)</label>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-3d"><i class="bi bi-check-lg"></i> Simpan</button>
+            <a href="/admin/technicians" class="btn btn-secondary btn-3d"><i class="bi bi-arrow-left"></i> Kembali</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header"><h6 class="mb-0"><i class="bi bi-info-circle"></i> Info</h6></div>
+      <div class="card-body small">
+        <p><strong>Auto-Assignment</strong> akan menugaskan laporan/tiket baru berdasarkan:</p>
+        <ol>
+          <li>Spesialisasi teknisi (cocok dengan jenis kerusakan)</li>
+          <li>Jumlah tugas aktif (least loaded)</li>
+          <li>Status ketersediaan</li>
+        </ol>
+        <p class="mb-0">Pastikan spesialisasi dan batas tugas terisi dengan benar agar auto-assignment berjalan optimal.</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,6 @@
+{
+  "watch": ["server.js", "controllers/", "models/", "utils/", "routes/", "views/"],
+  "ext": "js,ejs,json",
+  "ignore": ["node_modules/", "public/uploads/"],
+  "delay": 500
+}

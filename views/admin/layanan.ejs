@@ -1,0 +1,61 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0"><i class="bi bi-grid-3x3-gap me-2"></i>Jenis Layanan</h5>
+  <a href="/admin/layanan/create" class="btn btn-primary btn-3d">
+    <i class="bi bi-plus-circle"></i> Tambah Layanan
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table table-striped mb-0">
+      <thead>
+        <tr>
+          <th style="width:60px">No.</th>
+          <th>Nama Layanan</th>
+          <th>Kode</th>
+          <th>Kategori</th>
+          <th>Status</th>
+          <th style="width:160px">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% layanans.forEach(function(l, i) { %>
+        <tr>
+          <td><%= i + 1 %></td>
+          <td><strong><%= l.nama_layanan %></strong></td>
+          <td><code><%= l.kode %></code></td>
+          <td>
+            <% l.kategori.forEach(function(k) { %>
+            <span class="badge bg-secondary"><%= k.nama_kategori %></span>
+            <% }) %>
+            <% if (l.kategori.length === 0) { %>
+            <span class="text-muted">-</span>
+            <% } %>
+          </td>
+          <td>
+            <% if (l.is_active) { %>
+            <span class="badge bg-success">Aktif</span>
+            <% } else { %>
+            <span class="badge bg-secondary">Nonaktif</span>
+            <% } %>
+          </td>
+          <td>
+            <a href="/admin/layanan/<%= l.id %>/edit" class="btn btn-sm btn-warning">
+              <i class="bi bi-pencil"></i> Edit
+            </a>
+            <form action="/admin/layanan/<%= l.id %>/delete" method="POST" style="display:inline">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="button" class="btn btn-sm btn-danger" data-3d-delete data-confirm-msg="Hapus layanan <strong><%= l.nama_layanan %></strong>?<br><small class='text-muted'>Hanya bisa dihapus jika tidak memiliki kategori.</small>">
+                <i class="bi bi-trash"></i> Hapus
+              </button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+        <% if (layanans.length === 0) { %>
+        <tr><td colspan="6" class="text-center text-muted py-4">Tidak ada data</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
